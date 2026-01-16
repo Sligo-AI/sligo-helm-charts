@@ -33,4 +33,4 @@ helm install sligo-app sligo/sligo-cloud \
 
 ## Support
 
-For issues or questions, contact support@yourcompany.com
+For issues or questions, contact support@sligo.ai
