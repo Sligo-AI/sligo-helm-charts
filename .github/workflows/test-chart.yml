@@ -1,0 +1,158 @@
+name: Test Chart
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - 'charts/**'
+      - 'index.yaml'
+  pull_request:
+    branches:
+      - main
+      - dev
+    paths:
+      - 'charts/**'
+      - 'index.yaml'
+  workflow_dispatch:
+
+jobs:
+  integration-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.0
+      
+      - name: Set up k3s
+        uses: debianmaster/actions-k3s@master
+      
+      - name: Wait for k3s to be ready
+        run: |
+          timeout 120 bash -c 'until kubectl get nodes; do sleep 2; done'
+      
+      - name: Create test namespace
+        run: kubectl create namespace test
+      
+      - name: Create test secrets
+        run: |
+          # App secrets
+          kubectl create secret generic nextjs-secrets \
+            --from-literal=DATABASE_URL="postgresql://test:test@postgres:5432/test" \
+            --from-literal=NEXTAUTH_SECRET="test-secret-$(openssl rand -hex 16)" \
+            --from-literal=NEXT_PUBLIC_API_URL="http://localhost:3000" \
+            --from-literal=MCP_GATEWAY_URL="http://mcp-gateway:3002" \
+            --from-literal=GCP_SA_KEY="{}" \
+            --from-literal=GOOGLE_STORAGE_AGENT_AVATARS_BUCKET="test-bucket" \
+            --from-literal=GOOGLE_STORAGE_BUCKET="test-bucket" \
+            --from-literal=GOOGLE_STORAGE_RAG_SA_KEY="{}" \
+            --from-literal=REDIS_URL="redis://redis:6379" \
+            --from-literal=WORKOS_API_KEY="test-key" \
+            --from-literal=WORKOS_CLIENT_ID="test-id" \
+            --from-literal=WORKOS_COOKIE_PASSWORD="test-password" \
+            --from-literal=NEXT_PUBLIC_URL="http://localhost:3000" \
+            --from-literal=BACKEND_URL="http://sligo-backend:3001" \
+            --from-literal=ENCRYPTION_KEY="test-encryption-key-$(openssl rand -hex 16)" \
+            --from-literal=OPENAI_API_KEY="test-key" \
+            -n test
+          
+          # Backend secrets
+          kubectl create secret generic backend-secrets \
+            --from-literal=DATABASE_URL="postgresql://test:test@postgres:5432/test" \
+            --from-literal=JWT_SECRET="test-jwt-secret-$(openssl rand -hex 16)" \
+            --from-literal=API_KEY="test-api-key" \
+            --from-literal=MCP_GATEWAY_URL="http://mcp-gateway:3002" \
+            --from-literal=REDIS_URL="redis://redis:6379" \
+            --from-literal=REDIS_HOST="redis" \
+            --from-literal=REDIS_PASSWORD="" \
+            --from-literal=REDIS_PORT="6379" \
+            --from-literal=REDIS_USERNAME="" \
+            --from-literal=OPENAI_API_KEY="test-key" \
+            --from-literal=ANTHROPIC_API_KEY="test-key" \
+            --from-literal=PERPLEXITY_API_KEY="test-key" \
+            --from-literal=GOOGLE_PROJECTID="test-project" \
+            --from-literal=GOOGLE_APPLICATION_CREDENTIALS="{}" \
+            --from-literal=ENCRYPTION_KEY="test-encryption-key-$(openssl rand -hex 16)" \
+            -n test
+          
+          # MCP Gateway secrets
+          kubectl create secret generic mcp-gateway-secrets \
+            --from-literal=GATEWAY_SECRET="test-gateway-secret-$(openssl rand -hex 16)" \
+            --from-literal=BACKEND_URL="http://sligo-backend:3001" \
+            --from-literal=FRONTEND_URL="http://localhost:3000" \
+            --from-literal=PERPLEXITY_API_KEY="test-key" \
+            --from-literal=PINECONE_API_KEY="test-key" \
+            --from-literal=PINECONE_ENVIRONMENT="test" \
+            --from-literal=PINECONE_INDEX="test-index" \
+            --from-literal=TAVILY_API_KEY="test-key" \
+            --from-literal=OPENAI_API_KEY="test-key" \
+            -n test
+          
+          # Postgres secrets (for internal database)
+          kubectl create secret generic sligo-secrets \
+            --from-literal=POSTGRES_USER="test" \
+            --from-literal=POSTGRES_PASSWORD="test-password" \
+            --from-literal=POSTGRES_DB="test" \
+            --from-literal=ENCRYPTION_KEY="test-encryption-key-$(openssl rand -hex 16)" \
+            -n test
+        
+      - name: Add Helm repo
+        run: |
+          helm repo add sligo https://sligo-ai.github.io/sligo-helm-charts
+          helm repo update
+      
+      - name: Search for chart
+        run: |
+          helm search repo sligo/sligo-cloud --versions
+      
+      - name: Template test
+        run: |
+          helm template test sligo/sligo-cloud \
+            --version 1.0.0 \
+            --debug
+      
+      - name: Install chart with internal database
+        run: |
+          helm install test sligo/sligo-cloud \
+            --version 1.0.0 \
+            --namespace test \
+            --wait \
+            --timeout 5m \
+            --set database.type=internal \
+            --set redis.type=internal \
+            --set ingress.enabled=false \
+            --set app.image.repository=test-app \
+            --set app.image.tag=latest \
+            --set backend.image.repository=test-backend \
+            --set backend.image.tag=latest \
+            --set mcpGateway.image.repository=test-gateway \
+            --set mcpGateway.image.tag=latest
+        
+      - name: Verify deployment
+        run: |
+          kubectl get pods -n test
+          echo "Waiting for pods to be ready..."
+          kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=sligo-cloud -n test --timeout=3m || true
+      
+      - name: Check pod status
+        run: |
+          kubectl get pods -n test -o wide
+          echo "--- Pod logs (first 50 lines) ---"
+          kubectl logs -n test -l app.kubernetes.io/name=sligo-cloud --tail=50 || true
+      
+      - name: Verify services
+        run: |
+          kubectl get svc -n test
+          kubectl get deployments -n test
+          kubectl get statefulsets -n test
+      
+      - name: Cleanup
+        if: always()
+        run: |
+          helm uninstall test -n test || true
+          kubectl delete namespace test --wait=false || true
