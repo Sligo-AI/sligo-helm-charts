@@ -26,6 +26,7 @@ helm install sligo-app sligo/sligo-cloud \
 ## Documentation
 
 - [Installation Guide](docs/INSTALLATION.md)
+- [Terraform/IAC Integration](docs/TERRAFORM.md)
 - [Configuration Reference](docs/CONFIGURATION.md)
 - [Secrets Setup](docs/SECRETS.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)

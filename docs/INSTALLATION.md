@@ -8,16 +8,62 @@
 - `helm` version 3.10+
 
 ### Required Resources
-- ECR access to Sligo container images
+- Container image access to Sligo's Google Artifact Registry (GAR)
 - Domain name for application access
-- SSL certificate (ACM for AWS)
-- Database (RDS PostgreSQL 15+ or in-cluster)
-- Cache (ElastiCache Redis 7+ or in-cluster)
+- SSL certificate (ACM for AWS, or cert-manager for GCP/on-prem)
+- Database (RDS PostgreSQL 15+ for AWS, Cloud SQL for GCP, or in-cluster)
+- Cache (ElastiCache Redis 7+ for AWS, Memorystore for GCP, or in-cluster)
 
 ### Required Secrets
 See [SECRETS.md](./SECRETS.md) for details on required secret values.
 
 ## Installation Steps
+
+### 0. Get Container Image Access (Contact Sligo Support)
+
+Sligo hosts all container images in Google Artifact Registry (GAR), regardless of your cloud provider.
+
+**Registry details:**
+- **Project**: `sligo-ai-platform`
+- **Repository**: Client-specific (`[your-client-name]-containers`)
+- **Region**: `us-central1`
+
+**Contact Sligo support** (support@sligo.ai) to:
+- Request access to pull container images
+- Receive a service account key for your client-specific repository
+- Get your exact repository name and image URLs
+
+**After receiving access, create image pull secret:**
+
+1. **Save the service account key file** provided by Sligo (e.g., `sligo-service-account-key.json`)
+   - Store this file securely on your local machine
+   - **DO NOT commit this file to Git** - it contains credentials
+
+2. **Create Kubernetes secret** using the service account key:
+   ```bash
+   kubectl create secret docker-registry sligo-registry-credentials \
+     --docker-server=us-central1-docker.pkg.dev \
+     --docker-username=_json_key \
+     --docker-password="$(cat /path/to/sligo-service-account-key.json)" \
+     -n sligo
+   ```
+   This creates a Kubernetes secret in your cluster that will be used to authenticate to GAR when pulling images.
+
+3. **Reference the secret name in values.yaml** (see Step 4):
+   - Only the secret **name** (`sligo-registry-credentials`) goes in your values file
+   - The service account key file itself is **NOT** added to values.yaml
+   - The secret stores the credentials in Kubernetes
+
+**Example GAR image URLs:**
+```
+us-central1-docker.pkg.dev/sligo-ai-platform/your-client-containers/sligo-web:v1.0.0
+us-central1-docker.pkg.dev/sligo-ai-platform/your-client-containers/sligo-api:v1.0.0
+us-central1-docker.pkg.dev/sligo-ai-platform/your-client-containers/mcp-gateway:v1.0.0
+```
+
+Replace `your-client-containers` with your actual repository name provided by Sligo.
+
+**Important:** The service account key file is only used **once** to create the Kubernetes secret. After that, Kubernetes uses the secret to authenticate when pulling images during pod startup.
 
 ### 1. Add Helm Repository
 
@@ -79,11 +125,44 @@ cp examples/values-client-template.yaml values-production.yaml
 ```
 
 Edit `values-production.yaml` with your specific configuration:
-- Update ECR repository URLs
+
+**Required:**
+- Update container image repository URLs (get from Sligo support - GAR)
+- Configure `global.imagePullSecrets` to reference the secret name created in Step 0
+  - Use the secret **name** only (e.g., `sligo-registry-credentials`)
+  - The service account key file itself is NOT added here
 - Configure domain names
 - Set resource limits
 - Configure database connection
-- Add ACM certificate ARN
+- Add SSL certificate (ACM ARN for AWS, or cert-manager configuration for GCP)
+
+**Example configuration:**
+```yaml
+global:
+  # Reference the Kubernetes secret name (created in Step 0 using kubectl)
+  # The service account key file itself is NOT added here - only the secret name
+  imagePullSecrets:
+    - name: sligo-registry-credentials  # Secret name created in Kubernetes
+
+app:
+  image:
+    repository: us-central1-docker.pkg.dev/sligo-ai-platform/your-client-containers/sligo-web
+    tag: "v1.0.0"
+
+backend:
+  image:
+    repository: us-central1-docker.pkg.dev/sligo-ai-platform/your-client-containers/sligo-api
+    tag: "v1.0.0"
+
+mcpGateway:
+  image:
+    repository: us-central1-docker.pkg.dev/sligo-ai-platform/your-client-containers/mcp-gateway
+    tag: "v1.0.0"
+```
+
+**Note:** 
+- All containers are hosted in Sligo's Google Artifact Registry, regardless of your cloud provider (AWS or GCP)
+- Replace `your-client-containers` with your actual client-specific repository name provided by Sligo support
 
 ### 5. Install Chart
 
@@ -106,7 +185,7 @@ kubectl get svc -n sligo
 # Check ingress
 kubectl get ingress -n sligo
 
-# Get load balancer URL (AWS ALB)
+# Get load balancer URL (AWS ALB or GCP load balancer)
 kubectl get ingress -n sligo -o jsonpath='{.items[0].status.loadBalancer.ingress[0].hostname}'
 ```
 
@@ -115,9 +194,9 @@ kubectl get ingress -n sligo -o jsonpath='{.items[0].status.loadBalancer.ingress
 Point your domain to the load balancer:
 
 ```bash
-# Get ALB DNS name
-ALB_DNS=$(kubectl get ingress -n sligo -o jsonpath='{.items[0].status.loadBalancer.ingress[0].hostname}')
-echo "Create CNAME record: app.your-domain.com -> $ALB_DNS"
+# Get load balancer DNS name (ALB for AWS, or GCP load balancer IP/hostname)
+LB_HOST=$(kubectl get ingress -n sligo -o jsonpath='{.items[0].status.loadBalancer.ingress[0].hostname}')
+echo "Create CNAME record: app.your-domain.com -> $LB_HOST"
 ```
 
 ### 8. Test Application
@@ -182,6 +261,7 @@ See [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) for common issues.
 
 ## Next Steps
 
+- Review [TERRAFORM.md](./TERRAFORM.md) for Infrastructure as Code (IAC) deployment using Terraform
 - Review [CONFIGURATION.md](./CONFIGURATION.md) for advanced options
 - Set up monitoring and alerting
 - Configure backups
