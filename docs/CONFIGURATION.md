@@ -19,21 +19,54 @@ Complete reference for all configuration values in Sligo Cloud Helm chart.
 
 ```yaml
 global:
-  # Image pull secrets for private registries
+  # Image pull secrets for Sligo's Google Artifact Registry
+  # Reference the Kubernetes secret name (NOT the service account key file itself)
   imagePullSecrets: []
   # imagePullSecrets:
-  #   - name: ecr-credentials
+  #   - name: sligo-registry-credentials  # Secret name created in Kubernetes
 ```
 
-To create image pull secret:
+**To create image pull secret:**
+
+Sligo hosts all container images in Google Artifact Registry (GAR), regardless of your cloud provider. Sligo will provide a service account key JSON file for your client-specific repository.
+
+**Step 1:** Create the Kubernetes secret using the service account key file:
 
 ```bash
-kubectl create secret docker-registry ecr-credentials \
-  --docker-server=123456789.dkr.ecr.us-east-1.amazonaws.com \
-  --docker-username=AWS \
-  --docker-password=$(aws ecr get-login-password) \
+# Use the service account key file provided by Sligo (saved locally)
+kubectl create secret docker-registry sligo-registry-credentials \
+  --docker-server=us-central1-docker.pkg.dev \
+  --docker-username=_json_key \
+  --docker-password="$(cat /path/to/sligo-service-account-key.json)" \
   -n sligo
 ```
+
+**Step 2:** Reference the secret name in your values.yaml:
+```yaml
+global:
+  imagePullSecrets:
+    - name: sligo-registry-credentials  # Secret name only (not the key file)
+```
+
+**Important:** 
+- The service account key JSON file is **NOT** added to values.yaml
+- Only the secret **name** (`sligo-registry-credentials`) goes in values.yaml
+- The secret must exist in Kubernetes before running `helm install`
+
+**Registry details:**
+- Project: `sligo-ai-platform`
+- Region: `us-central1`
+- Repository: `your-client-containers` (client-specific, provided by Sligo)
+- Service account: Client-specific service account with access to your repository
+
+**Example image URLs:**
+```
+us-central1-docker.pkg.dev/sligo-ai-platform/your-client-containers/sligo-web:v1.0.0
+us-central1-docker.pkg.dev/sligo-ai-platform/your-client-containers/sligo-api:v1.0.0
+us-central1-docker.pkg.dev/sligo-ai-platform/your-client-containers/mcp-gateway:v1.0.0
+```
+
+**Note:** Contact Sligo support (support@sligo.ai) to get access, exact registry URLs, and your client-specific repository name.
 
 ## App Component
 
@@ -46,7 +79,7 @@ app:
   replicaCount: 2                  # Number of pods
   
   image:
-    repository: "..."              # ECR repository URL
+    repository: "..."              # Container image repository URL (ECR or GAR)
     tag: "latest"                  # Image tag
     pullPolicy: Always             # Always, IfNotPresent, Never
   

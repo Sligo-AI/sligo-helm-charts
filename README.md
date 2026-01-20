@@ -2,7 +2,11 @@
 
 Official Helm charts for deploying Sligo Cloud Platform.
 
-**Repository:** [https://github.com/Sligo-AI/sligo-helm-charts](https://github.com/Sligo-AI/sligo-helm-charts)
+**Helm Repository:** [https://github.com/Sligo-AI/sligo-helm-charts](https://github.com/Sligo-AI/sligo-helm-charts)
+**Helm Page:** [https://sligo-ai.github.io/sligo-helm-charts/](https://sligo-ai.github.io/sligo-helm-charts/)
+**Terraform Repository:** [https://github.com/Sligo-AI/sligo-terraform](https://github.com/Sligo-AI/sligo-terraform)
+
+
 
 ## Installation
 
@@ -26,6 +30,7 @@ helm install sligo-app sligo/sligo-cloud \
 ## Documentation
 
 - [Installation Guide](docs/INSTALLATION.md)
+- [Terraform/IAC Integration](docs/TERRAFORM.md)
 - [Configuration Reference](docs/CONFIGURATION.md)
 - [Secrets Setup](docs/SECRETS.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
