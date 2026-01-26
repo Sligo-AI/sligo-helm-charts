@@ -37,6 +37,8 @@ Use External Secrets Operator to sync from AWS Secrets Manager.
 
 ## Required Secrets
 
+> **Note:** Variables marked as "Optional" can be omitted from the secret if not needed. The application will use default values or function without them. However, some optional variables may be required for specific features to work (e.g., LLM API keys for AI features).
+
 ### 1. nextjs-secrets
 
 Application frontend secrets.
@@ -51,7 +53,6 @@ Application frontend secrets.
 - `PINECONE_API_KEY=your_pinecone_api_key`
 - `PINECONE_INDEX=your_pinecone_index`
 - `PORT=3000`
-- `GOOGLE_PROJECTID=your_google_project_id`
 - `WORKOS_API_KEY=your_workos_api_key`
 - `WORKOS_CLIENT_ID=your_workos_client_id`
 - `WORKOS_COOKIE_PASSWORD=<generate with: openssl rand -base64 32>`
@@ -69,6 +70,9 @@ Application frontend secrets.
 - `RAG_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string)
 - `OPENAI_API_KEY=sk-...`
 
+**Optional Keys:**
+- `GOOGLE_PROJECTID=your_google_project_id` (optional, but recommended)
+
 **Creation:**
 ```bash
 kubectl create secret generic nextjs-secrets \
@@ -81,7 +85,6 @@ kubectl create secret generic nextjs-secrets \
   --from-literal=PINECONE_API_KEY="your_pinecone_api_key" \
   --from-literal=PINECONE_INDEX="your_pinecone_index" \
   --from-literal=PORT="3000" \
-  --from-literal=GOOGLE_PROJECTID="your_google_project_id" \
   --from-literal=WORKOS_API_KEY="your_workos_api_key" \
   --from-literal=WORKOS_CLIENT_ID="your_workos_client_id" \
   --from-literal=WORKOS_COOKIE_PASSWORD="$(openssl rand -base64 32)" \
@@ -98,6 +101,7 @@ kubectl create secret generic nextjs-secrets \
   --from-literal=GCP_SA_KEY='{"type":"service_account","project_id":"..."}' \
   --from-literal=RAG_SA_KEY='{"type":"service_account","project_id":"..."}' \
   --from-literal=OPENAI_API_KEY="sk-..." \
+  --from-literal=GOOGLE_PROJECTID="your_google_project_id" \
   -n sligo
 ```
 
@@ -111,19 +115,19 @@ Backend API secrets.
 - `GOOGLE_PROJECTID=your_google_project_id`
 - `MCP_GATEWAY_URL=http://mcp-gateway:3002` (or external URL)
 - `DATABASE_URL=postgresql://user:password@host:5432/database`
-- `VERBOSE_LOGGING=true` (or `false`)
-- `BACKEND_REQUEST_TIMEOUT_MS=300000`
 - `ENCRYPTION_KEY=<generate with: openssl rand -base64 32>`
 - `REDIS_URL=redis://redis:6379` (or external Redis URL)
 - `BUCKET_NAME_FILE_MANAGER=your_storage_bucket`
-- `GCP_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string)
-- `ANTHROPIC_API_KEY=sk-ant-...`
-- `GOOGLE_VERTEX_AI_WEB_CREDENTIALS={"type":"service_account","project_id":"..."}` (JSON string)
 - `OPENAI_API_KEY=sk-...`
-- `OPENAI_BASE_URL=https://api.openai.com/v1`
 
 **Optional Keys:**
-- `LANGSMITH_API_KEY=your_langsmith_api_key`
+- `VERBOSE_LOGGING=true` (or `false`, defaults to `true`)
+- `BACKEND_REQUEST_TIMEOUT_MS=300000` (defaults to 300000 if not set)
+- `GCP_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string, optional)
+- `ANTHROPIC_API_KEY=sk-ant-...` (optional)
+- `GOOGLE_VERTEX_AI_WEB_CREDENTIALS={"type":"service_account","project_id":"..."}` (JSON string, optional)
+- `OPENAI_BASE_URL=https://api.openai.com/v1` (defaults to `https://api.openai.com/v1` if not set)
+- `LANGSMITH_API_KEY=your_langsmith_api_key` (optional)
 
 **Creation:**
 ```bash
@@ -133,16 +137,17 @@ kubectl create secret generic backend-secrets \
   --from-literal=GOOGLE_PROJECTID="your_google_project_id" \
   --from-literal=MCP_GATEWAY_URL="http://mcp-gateway:3002" \
   --from-literal=DATABASE_URL="postgresql://user:pass@host:5432/db" \
-  --from-literal=VERBOSE_LOGGING="false" \
-  --from-literal=BACKEND_REQUEST_TIMEOUT_MS="300000" \
   --from-literal=ENCRYPTION_KEY="$(openssl rand -base64 32)" \
   --from-literal=REDIS_URL="redis://redis:6379" \
   --from-literal=BUCKET_NAME_FILE_MANAGER="your_storage_bucket" \
+  --from-literal=OPENAI_API_KEY="sk-..." \
+  --from-literal=VERBOSE_LOGGING="false" \
+  --from-literal=BACKEND_REQUEST_TIMEOUT_MS="300000" \
   --from-literal=GCP_SA_KEY='{"type":"service_account","project_id":"..."}' \
   --from-literal=ANTHROPIC_API_KEY="sk-ant-..." \
   --from-literal=GOOGLE_VERTEX_AI_WEB_CREDENTIALS='{"type":"service_account","project_id":"..."}' \
-  --from-literal=OPENAI_API_KEY="sk-..." \
   --from-literal=OPENAI_BASE_URL="https://api.openai.com/v1" \
+  --from-literal=LANGSMITH_API_KEY="your_langsmith_api_key" \
   -n sligo
 ```
 
@@ -157,11 +162,6 @@ MCP Gateway secrets.
 - `PINECONE_INDEX=your_pinecone_index`
 - `REDIS_URL=redis://redis:6379` (or external Redis URL)
 - `BUCKET_NAME_FILE_MANAGER=your_storage_bucket`
-- `GOOGLE_PROJECTID=your_google_project_id`
-- `GCP_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string)
-- `ANTHROPIC_API_KEY=sk-ant-...`
-- `OPENAI_API_KEY=sk-...`
-- `GOOGLE_VERTEX_AI_WEB_CREDENTIALS={"type":"service_account","project_id":"..."}` (JSON string)
 - `SPENDHQ_BASE_URL=https://your-spendhq-url.com`
 - `SPENDHQ_CLIENT_ID=your_spendhq_client_id`
 - `SPENDHQ_CLIENT_SECRET=your_spendhq_client_secret`
@@ -170,6 +170,13 @@ MCP Gateway secrets.
 - `SPENDHQ_SS_USERNAME=your_singlestore_username`
 - `SPENDHQ_SS_PASSWORD=your_singlestore_password`
 - `SPENDHQ_SS_PORT=3306`
+
+**Optional Keys:**
+- `GOOGLE_PROJECTID=your_google_project_id` (optional)
+- `GCP_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string, optional)
+- `ANTHROPIC_API_KEY=sk-ant-...` (optional)
+- `OPENAI_API_KEY=sk-...` (optional)
+- `GOOGLE_VERTEX_AI_WEB_CREDENTIALS={"type":"service_account","project_id":"..."}` (JSON string, optional)
 
 **Creation:**
 ```bash
@@ -180,11 +187,6 @@ kubectl create secret generic mcp-gateway-secrets \
   --from-literal=PINECONE_INDEX="your_pinecone_index" \
   --from-literal=REDIS_URL="redis://redis:6379" \
   --from-literal=BUCKET_NAME_FILE_MANAGER="your_storage_bucket" \
-  --from-literal=GOOGLE_PROJECTID="your_google_project_id" \
-  --from-literal=GCP_SA_KEY='{"type":"service_account","project_id":"..."}' \
-  --from-literal=ANTHROPIC_API_KEY="sk-ant-..." \
-  --from-literal=OPENAI_API_KEY="sk-..." \
-  --from-literal=GOOGLE_VERTEX_AI_WEB_CREDENTIALS='{"type":"service_account","project_id":"..."}' \
   --from-literal=SPENDHQ_BASE_URL="https://your-spendhq-url.com" \
   --from-literal=SPENDHQ_CLIENT_ID="your_spendhq_client_id" \
   --from-literal=SPENDHQ_CLIENT_SECRET="your_spendhq_client_secret" \
@@ -193,6 +195,11 @@ kubectl create secret generic mcp-gateway-secrets \
   --from-literal=SPENDHQ_SS_USERNAME="your_singlestore_username" \
   --from-literal=SPENDHQ_SS_PASSWORD="your_singlestore_password" \
   --from-literal=SPENDHQ_SS_PORT="3306" \
+  --from-literal=GOOGLE_PROJECTID="your_google_project_id" \
+  --from-literal=GCP_SA_KEY='{"type":"service_account","project_id":"..."}' \
+  --from-literal=ANTHROPIC_API_KEY="sk-ant-..." \
+  --from-literal=OPENAI_API_KEY="sk-..." \
+  --from-literal=GOOGLE_VERTEX_AI_WEB_CREDENTIALS='{"type":"service_account","project_id":"..."}' \
   -n sligo
 ```
 
