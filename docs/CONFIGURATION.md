@@ -68,6 +68,30 @@ us-central1-docker.pkg.dev/sligo-ai-platform/your-client-containers/mcp-gateway:
 
 **Note:** Contact Sligo support (support@sligo.ai) to get access, exact registry URLs, and your client-specific repository name.
 
+### Image Version Tags
+
+Sligo Cloud uses semantic versioning for container images. **For production deployments, always pin to specific version tags:**
+
+```yaml
+app:
+  image:
+    tag: "v1.0.0"  # Production: Pin to specific version
+
+backend:
+  image:
+    tag: "v1.0.0"  # Production: Pin to specific version
+
+mcpGateway:
+  image:
+    tag: "v1.0.0"  # Production: Pin to specific version
+```
+
+**Finding available versions:**
+- Check Google Artifact Registry: `gcloud artifacts docker images list us-central1-docker.pkg.dev/sligo-ai-platform/<your-repo>/sligo-backend --format="table(tags)"`
+- Contact Sligo support (support@sligo.ai) for a list of available versions
+
+**Development/testing:** You can use `"latest"` for development, but this is **not recommended for production** as it can cause unexpected updates.
+
 ## App Component
 
 Frontend Next.js application.
@@ -80,7 +104,7 @@ app:
   
   image:
     repository: "..."              # Container image repository URL (ECR or GAR)
-    tag: "latest"                  # Image tag
+    tag: "v1.0.0"                  # Image tag - use version tags (e.g., v1.0.0, v1.2.3) for production. "latest" for development only.
     pullPolicy: Always             # Always, IfNotPresent, Never
   
   service:
@@ -140,7 +164,7 @@ backend:
   
   image:
     repository: "..."
-    tag: "latest"
+    tag: "v1.0.0"                  # Image tag - use version tags (e.g., v1.0.0, v1.2.3) for production. "latest" for development only.
     pullPolicy: Always
   
   service:
@@ -172,7 +196,7 @@ mcpGateway:
   
   image:
     repository: "..."
-    tag: "latest"
+    tag: "v1.0.0"                  # Image tag - use version tags (e.g., v1.0.0, v1.2.3) for production. "latest" for development only.
     pullPolicy: Always
   
   service:

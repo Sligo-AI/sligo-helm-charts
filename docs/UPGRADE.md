@@ -232,11 +232,31 @@ app:
 
 ### Updating Image Tags
 
-```yaml
-app:
-  image:
-    tag: "v1.2.0"  # Updated from v1.1.0
-```
+To upgrade to a new application version:
+
+1. **Check available versions** in Google Artifact Registry or contact Sligo support
+2. **Update image tags** in your `values.yaml`:
+   ```yaml
+   app:
+     image:
+       tag: "v1.2.0"  # Updated from v1.1.0
+   
+   backend:
+     image:
+       tag: "v1.2.0"  # Updated from v1.1.0
+   
+   mcpGateway:
+     image:
+       tag: "v1.2.0"  # Updated from v1.1.0
+   ```
+3. **Apply the upgrade:**
+   ```bash
+   helm upgrade sligo-app sligo/sligo-cloud \
+     -f values-production.yaml \
+     -n sligo
+   ```
+
+**Important:** Always use version tags (e.g., `v1.0.0`, `v1.2.3`) in production. Avoid using `latest` as it can cause unexpected updates.
 
 ## Troubleshooting Upgrades
 

@@ -80,25 +80,34 @@ kubectl create namespace sligo
 
 ### 3. Create Secrets
 
-Create all required secrets before installation:
+Create all required secrets before installation. **See [SECRETS.md](./SECRETS.md) for the complete list of required keys and full creation commands.**
+
+**Quick reference** (simplified examples - see SECRETS.md for complete commands):
 
 ```bash
-# App secrets
+# App secrets (nextjs-secrets) - See SECRETS.md for all 28 required keys
 kubectl create secret generic nextjs-secrets \
+  --from-literal=BACKEND_URL="https://your-backend-url.com" \
   --from-literal=DATABASE_URL="postgresql://user:pass@host:5432/db" \
-  --from-literal=NEXTAUTH_SECRET="your-secret-here" \
-  --from-literal=NEXT_PUBLIC_API_URL="https://api.your-domain.com" \
+  --from-literal=ENCRYPTION_KEY="$(openssl rand -base64 32)" \
+  --from-literal=NEXT_PUBLIC_URL="https://app.your-domain.com" \
+  --from-literal=WORKOS_COOKIE_PASSWORD="$(openssl rand -base64 32)" \
+  # ... (see SECRETS.md for all 28 required keys)
   -n sligo
 
-# Backend secrets
+# Backend secrets (backend-secrets) - See SECRETS.md for all 15 required keys
 kubectl create secret generic backend-secrets \
-  --from-literal=JWT_SECRET="your-jwt-secret" \
-  --from-literal=API_KEY="your-api-key" \
+  --from-literal=DATABASE_URL="postgresql://user:pass@host:5432/db" \
+  --from-literal=ENCRYPTION_KEY="$(openssl rand -base64 32)" \
+  --from-literal=REDIS_URL="redis://redis:6379" \
+  # ... (see SECRETS.md for all 15 required keys)
   -n sligo
 
-# MCP Gateway secrets
+# MCP Gateway secrets (mcp-gateway-secrets) - See SECRETS.md for all 19 required keys
 kubectl create secret generic mcp-gateway-secrets \
-  --from-literal=GATEWAY_SECRET="your-gateway-secret" \
+  --from-literal=FRONTEND_URL="https://app.your-domain.com" \
+  --from-literal=REDIS_URL="redis://redis:6379" \
+  # ... (see SECRETS.md for all 19 required keys)
   -n sligo
 
 # Database credentials (if using external)
@@ -114,7 +123,7 @@ kubectl create secret generic redis-external-secrets \
   -n sligo
 ```
 
-See [SECRETS.md](./SECRETS.md) for complete list of required keys.
+**⚠️ Important:** The examples above are simplified. You **must** include all required keys listed in [SECRETS.md](./SECRETS.md) for each secret, or your deployment will fail.
 
 ### 4. Customize Values
 
