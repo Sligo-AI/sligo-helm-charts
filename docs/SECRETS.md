@@ -42,26 +42,62 @@ Use External Secrets Operator to sync from AWS Secrets Manager.
 Application frontend secrets.
 
 **Required Keys:**
+- `BACKEND_URL=https://your-backend-url.com`
 - `DATABASE_URL=postgresql://user:password@host:5432/database`
-- `NEXTAUTH_URL=https://app.your-domain.com`
-- `NEXTAUTH_SECRET=<generate with: openssl rand -base64 32>`
-- `NEXT_PUBLIC_API_URL=https://api.your-domain.com`
-
-**Optional Keys:**
-- `SMTP_HOST=smtp.example.com`
-- `SMTP_PORT=587`
-- `SMTP_USER=noreply@your-domain.com`
-- `SMTP_PASSWORD=smtp-password`
-- `GOOGLE_CLIENT_ID=your-google-oauth-id`
-- `GOOGLE_CLIENT_SECRET=your-google-oauth-secret`
+- `ENCRYPTION_KEY=<generate with: openssl rand -base64 32>`
+- `MCP_GATEWAY_URL=http://mcp-gateway:3002` (or external URL)
+- `NEXT_PUBLIC_URL=https://app.your-domain.com`
+- `NODE_ENV=production` (or `development`)
+- `PINECONE_API_KEY=your_pinecone_api_key`
+- `PINECONE_INDEX=your_pinecone_index`
+- `PORT=3000`
+- `GOOGLE_PROJECTID=your_google_project_id`
+- `WORKOS_API_KEY=your_workos_api_key`
+- `WORKOS_CLIENT_ID=your_workos_client_id`
+- `WORKOS_COOKIE_PASSWORD=<generate with: openssl rand -base64 32>`
+- `NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id`
+- `NEXT_PUBLIC_GOOGLE_CLIENT_KEY=your_google_client_key`
+- `NEXT_PUBLIC_ONEDRIVE_CLIENT_ID=your_onedrive_client_id`
+- `GOOGLE_CLIENT_SECRET=your_google_client_secret`
+- `ONEDRIVE_CLIENT_SECRET=your_onedrive_client_secret`
+- `REDIS_URL=redis://redis:6379` (or external Redis URL)
+- `BUCKET_NAME_AGENT_AVATARS=your_avatars_bucket`
+- `BUCKET_NAME_FILE_MANAGER=your_storage_bucket`
+- `BUCKET_NAME_LOGOS=your_logos_bucket`
+- `BUCKET_NAME_RAG=your_rag_bucket`
+- `GCP_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string)
+- `RAG_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string)
+- `OPENAI_API_KEY=sk-...`
 
 **Creation:**
 ```bash
 kubectl create secret generic nextjs-secrets \
+  --from-literal=BACKEND_URL="https://your-backend-url.com" \
   --from-literal=DATABASE_URL="postgresql://user:pass@host:5432/db" \
-  --from-literal=NEXTAUTH_URL="https://app.your-domain.com" \
-  --from-literal=NEXTAUTH_SECRET="$(openssl rand -base64 32)" \
-  --from-literal=NEXT_PUBLIC_API_URL="https://api.your-domain.com" \
+  --from-literal=ENCRYPTION_KEY="$(openssl rand -base64 32)" \
+  --from-literal=MCP_GATEWAY_URL="http://mcp-gateway:3002" \
+  --from-literal=NEXT_PUBLIC_URL="https://app.your-domain.com" \
+  --from-literal=NODE_ENV="production" \
+  --from-literal=PINECONE_API_KEY="your_pinecone_api_key" \
+  --from-literal=PINECONE_INDEX="your_pinecone_index" \
+  --from-literal=PORT="3000" \
+  --from-literal=GOOGLE_PROJECTID="your_google_project_id" \
+  --from-literal=WORKOS_API_KEY="your_workos_api_key" \
+  --from-literal=WORKOS_CLIENT_ID="your_workos_client_id" \
+  --from-literal=WORKOS_COOKIE_PASSWORD="$(openssl rand -base64 32)" \
+  --from-literal=NEXT_PUBLIC_GOOGLE_CLIENT_ID="your_google_client_id" \
+  --from-literal=NEXT_PUBLIC_GOOGLE_CLIENT_KEY="your_google_client_key" \
+  --from-literal=NEXT_PUBLIC_ONEDRIVE_CLIENT_ID="your_onedrive_client_id" \
+  --from-literal=GOOGLE_CLIENT_SECRET="your_google_client_secret" \
+  --from-literal=ONEDRIVE_CLIENT_SECRET="your_onedrive_client_secret" \
+  --from-literal=REDIS_URL="redis://redis:6379" \
+  --from-literal=BUCKET_NAME_AGENT_AVATARS="your_avatars_bucket" \
+  --from-literal=BUCKET_NAME_FILE_MANAGER="your_storage_bucket" \
+  --from-literal=BUCKET_NAME_LOGOS="your_logos_bucket" \
+  --from-literal=BUCKET_NAME_RAG="your_rag_bucket" \
+  --from-literal=GCP_SA_KEY='{"type":"service_account","project_id":"..."}' \
+  --from-literal=RAG_SA_KEY='{"type":"service_account","project_id":"..."}' \
+  --from-literal=OPENAI_API_KEY="sk-..." \
   -n sligo
 ```
 
@@ -70,23 +106,43 @@ kubectl create secret generic nextjs-secrets \
 Backend API secrets.
 
 **Required Keys:**
+- `NODE_ENV=production` (or `development`)
+- `PORT=3001`
+- `GOOGLE_PROJECTID=your_google_project_id`
+- `MCP_GATEWAY_URL=http://mcp-gateway:3002` (or external URL)
 - `DATABASE_URL=postgresql://user:password@host:5432/database`
-- `JWT_SECRET=<generate with: openssl rand -base64 32>`
-- `API_KEY=<your-api-key>`
+- `VERBOSE_LOGGING=true` (or `false`)
+- `BACKEND_REQUEST_TIMEOUT_MS=300000`
+- `ENCRYPTION_KEY=<generate with: openssl rand -base64 32>`
+- `REDIS_URL=redis://redis:6379` (or external Redis URL)
+- `BUCKET_NAME_FILE_MANAGER=your_storage_bucket`
+- `GCP_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string)
+- `ANTHROPIC_API_KEY=sk-ant-...`
+- `GOOGLE_VERTEX_AI_WEB_CREDENTIALS={"type":"service_account","project_id":"..."}` (JSON string)
+- `OPENAI_API_KEY=sk-...`
+- `OPENAI_BASE_URL=https://api.openai.com/v1`
 
 **Optional Keys:**
-- `AWS_ACCESS_KEY_ID=AKIA...`
-- `AWS_SECRET_ACCESS_KEY=...`
-- `AWS_REGION=us-east-1`
-- `S3_BUCKET=your-bucket-name`
-- `REDIS_URL=redis://redis:6379`
+- `LANGSMITH_API_KEY=your_langsmith_api_key`
 
 **Creation:**
 ```bash
 kubectl create secret generic backend-secrets \
+  --from-literal=NODE_ENV="production" \
+  --from-literal=PORT="3001" \
+  --from-literal=GOOGLE_PROJECTID="your_google_project_id" \
+  --from-literal=MCP_GATEWAY_URL="http://mcp-gateway:3002" \
   --from-literal=DATABASE_URL="postgresql://user:pass@host:5432/db" \
-  --from-literal=JWT_SECRET="$(openssl rand -base64 32)" \
-  --from-literal=API_KEY="your-api-key-here" \
+  --from-literal=VERBOSE_LOGGING="false" \
+  --from-literal=BACKEND_REQUEST_TIMEOUT_MS="300000" \
+  --from-literal=ENCRYPTION_KEY="$(openssl rand -base64 32)" \
+  --from-literal=REDIS_URL="redis://redis:6379" \
+  --from-literal=BUCKET_NAME_FILE_MANAGER="your_storage_bucket" \
+  --from-literal=GCP_SA_KEY='{"type":"service_account","project_id":"..."}' \
+  --from-literal=ANTHROPIC_API_KEY="sk-ant-..." \
+  --from-literal=GOOGLE_VERTEX_AI_WEB_CREDENTIALS='{"type":"service_account","project_id":"..."}' \
+  --from-literal=OPENAI_API_KEY="sk-..." \
+  --from-literal=OPENAI_BASE_URL="https://api.openai.com/v1" \
   -n sligo
 ```
 
@@ -95,14 +151,48 @@ kubectl create secret generic backend-secrets \
 MCP Gateway secrets.
 
 **Required Keys:**
-- `GATEWAY_SECRET=<generate with: openssl rand -base64 32>`
-- `BACKEND_URL=http://sligo-backend:3001`
+- `PORT=3002`
+- `FRONTEND_URL=https://app.your-domain.com`
+- `PINECONE_API_KEY=your_pinecone_api_key`
+- `PINECONE_INDEX=your_pinecone_index`
+- `REDIS_URL=redis://redis:6379` (or external Redis URL)
+- `BUCKET_NAME_FILE_MANAGER=your_storage_bucket`
+- `GOOGLE_PROJECTID=your_google_project_id`
+- `GCP_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string)
+- `ANTHROPIC_API_KEY=sk-ant-...`
+- `OPENAI_API_KEY=sk-...`
+- `GOOGLE_VERTEX_AI_WEB_CREDENTIALS={"type":"service_account","project_id":"..."}` (JSON string)
+- `SPENDHQ_BASE_URL=https://your-spendhq-url.com`
+- `SPENDHQ_CLIENT_ID=your_spendhq_client_id`
+- `SPENDHQ_CLIENT_SECRET=your_spendhq_client_secret`
+- `SPENDHQ_TOKEN_URL=https://your-spendhq-token-url.com`
+- `SPENDHQ_SS_HOST=your_singlestore_host`
+- `SPENDHQ_SS_USERNAME=your_singlestore_username`
+- `SPENDHQ_SS_PASSWORD=your_singlestore_password`
+- `SPENDHQ_SS_PORT=3306`
 
 **Creation:**
 ```bash
 kubectl create secret generic mcp-gateway-secrets \
-  --from-literal=GATEWAY_SECRET="$(openssl rand -base64 32)" \
-  --from-literal=BACKEND_URL="http://sligo-backend:3001" \
+  --from-literal=PORT="3002" \
+  --from-literal=FRONTEND_URL="https://app.your-domain.com" \
+  --from-literal=PINECONE_API_KEY="your_pinecone_api_key" \
+  --from-literal=PINECONE_INDEX="your_pinecone_index" \
+  --from-literal=REDIS_URL="redis://redis:6379" \
+  --from-literal=BUCKET_NAME_FILE_MANAGER="your_storage_bucket" \
+  --from-literal=GOOGLE_PROJECTID="your_google_project_id" \
+  --from-literal=GCP_SA_KEY='{"type":"service_account","project_id":"..."}' \
+  --from-literal=ANTHROPIC_API_KEY="sk-ant-..." \
+  --from-literal=OPENAI_API_KEY="sk-..." \
+  --from-literal=GOOGLE_VERTEX_AI_WEB_CREDENTIALS='{"type":"service_account","project_id":"..."}' \
+  --from-literal=SPENDHQ_BASE_URL="https://your-spendhq-url.com" \
+  --from-literal=SPENDHQ_CLIENT_ID="your_spendhq_client_id" \
+  --from-literal=SPENDHQ_CLIENT_SECRET="your_spendhq_client_secret" \
+  --from-literal=SPENDHQ_TOKEN_URL="https://your-spendhq-token-url.com" \
+  --from-literal=SPENDHQ_SS_HOST="your_singlestore_host" \
+  --from-literal=SPENDHQ_SS_USERNAME="your_singlestore_username" \
+  --from-literal=SPENDHQ_SS_PASSWORD="your_singlestore_password" \
+  --from-literal=SPENDHQ_SS_PORT="3306" \
   -n sligo
 ```
 
@@ -167,7 +257,7 @@ kubectl create secret generic redis-external-secrets \
 - **Rotate secrets regularly**
   - Database passwords every 90 days
   - API keys every 180 days
-  - JWT secrets yearly
+  - Encryption keys yearly
 - **Use AWS Secrets Manager for production**
   - Automatic rotation
   - Audit logging
