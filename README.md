@@ -10,6 +10,33 @@ Official Helm charts for deploying Sligo Cloud Platform.
 
 ## Installation
 
+### Prerequisites
+
+**⚠️ IMPORTANT: Create Required Secrets Before Installation**
+
+Before installing the Helm chart, you must create Kubernetes secrets containing all required environment variables. The chart expects these secrets to exist:
+
+- **`nextjs-secrets`** - Frontend/Next.js application secrets
+- **`backend-secrets`** - Backend API secrets  
+- **`mcp-gateway-secrets`** - MCP Gateway secrets
+- **`postgres-secrets`** or **`postgres-external-secrets`** - Database credentials (depending on database type)
+- **`redis-external-secrets`** - Redis credentials (if using external Redis)
+
+**📖 See [Secrets Setup Guide](docs/SECRETS.md) for complete list of required keys and creation commands.**
+
+Example:
+```bash
+# Create namespace first
+kubectl create namespace sligo
+
+# Create secrets (see SECRETS.md for full command with all keys)
+kubectl create secret generic nextjs-secrets \
+  --from-literal=BACKEND_URL="https://your-backend-url.com" \
+  --from-literal=DATABASE_URL="postgresql://..." \
+  # ... (see SECRETS.md for complete list)
+  -n sligo
+```
+
 ### Add Helm Repository
 
 ```bash
@@ -27,14 +54,16 @@ helm install sligo-app sligo/sligo-cloud \
   --create-namespace
 ```
 
+**Note:** The `--create-namespace` flag will create the namespace if it doesn't exist, but secrets must be created manually before or after installation.
+
 ## Documentation
 
-- [Installation Guide](docs/INSTALLATION.md)
-- [Terraform/IAC Integration](docs/TERRAFORM.md)
-- [Configuration Reference](docs/CONFIGURATION.md)
-- [Secrets Setup](docs/SECRETS.md)
-- [Troubleshooting](docs/TROUBLESHOOTING.md)
-- [Upgrade Guide](docs/UPGRADE.md)
+- [Installation Guide](docs/INSTALLATION.md) - Step-by-step installation instructions
+- **[Secrets Setup](docs/SECRETS.md)** ⚠️ **REQUIRED** - Complete list of required environment variables and secret creation commands
+- [Configuration Reference](docs/CONFIGURATION.md) - All available configuration options
+- [Terraform/IAC Integration](docs/TERRAFORM.md) - Infrastructure as Code setup
+- [Troubleshooting](docs/TROUBLESHOOTING.md) - Common issues and solutions
+- [Upgrade Guide](docs/UPGRADE.md) - How to upgrade to new versions
 
 ## 📌 Versioning and Image Tags
 
