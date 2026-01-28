@@ -66,12 +66,21 @@ Application frontend secrets.
 - `BUCKET_NAME_FILE_MANAGER=your_storage_bucket`
 - `BUCKET_NAME_LOGOS=your_logos_bucket`
 - `BUCKET_NAME_RAG=your_rag_bucket`
-- `GCP_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string)
-- `RAG_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string)
 - `OPENAI_API_KEY=sk-...`
 
 **Optional Keys:**
 - `GOOGLE_PROJECTID=your_google_project_id` (optional, but recommended)
+- **Storage Credentials (choose one):**
+  - **GCS (Google Cloud Storage):**
+    - `GCP_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string, optional)
+    - `RAG_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string, optional)
+  - **AWS S3:**
+    - `AWS_ACCESS_KEY_ID=your_aws_access_key_id` (optional)
+    - `AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key` (optional)
+    - `AWS_REGION=us-east-1` (optional, defaults to us-east-1)
+    - `AWS_ENDPOINT=https://s3.amazonaws.com` (optional, for S3-compatible services)
+  
+  > **Note:** You must provide either GCP credentials (`GCP_SA_KEY`/`RAG_SA_KEY`) OR AWS credentials (`AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`), but not both. The application will auto-detect the provider based on available credentials.
 
 **Creation:**
 ```bash
@@ -98,10 +107,17 @@ kubectl create secret generic nextjs-secrets \
   --from-literal=BUCKET_NAME_FILE_MANAGER="your_storage_bucket" \
   --from-literal=BUCKET_NAME_LOGOS="your_logos_bucket" \
   --from-literal=BUCKET_NAME_RAG="your_rag_bucket" \
-  --from-literal=GCP_SA_KEY='{"type":"service_account","project_id":"..."}' \
-  --from-literal=RAG_SA_KEY='{"type":"service_account","project_id":"..."}' \
   --from-literal=OPENAI_API_KEY="sk-..." \
   --from-literal=GOOGLE_PROJECTID="your_google_project_id" \
+  # Storage credentials (choose GCS OR AWS, not both):
+  # For GCS:
+  --from-literal=GCP_SA_KEY='{"type":"service_account","project_id":"..."}' \
+  --from-literal=RAG_SA_KEY='{"type":"service_account","project_id":"..."}' \
+  # OR for AWS S3:
+  # --from-literal=AWS_ACCESS_KEY_ID="your_aws_access_key_id" \
+  # --from-literal=AWS_SECRET_ACCESS_KEY="your_aws_secret_access_key" \
+  # --from-literal=AWS_REGION="us-east-1" \
+  # --from-literal=AWS_ENDPOINT="https://s3.amazonaws.com" \
   -n sligo
 ```
 
@@ -123,7 +139,16 @@ Backend API secrets.
 **Optional Keys:**
 - `VERBOSE_LOGGING=true` (or `false`, defaults to `true`)
 - `BACKEND_REQUEST_TIMEOUT_MS=300000` (defaults to 300000 if not set)
-- `GCP_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string, optional)
+- **Storage Credentials (choose one):**
+  - **GCS (Google Cloud Storage):**
+    - `GCP_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string, optional)
+  - **AWS S3:**
+    - `AWS_ACCESS_KEY_ID=your_aws_access_key_id` (optional)
+    - `AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key` (optional)
+    - `AWS_REGION=us-east-1` (optional, defaults to us-east-1)
+    - `AWS_ENDPOINT=https://s3.amazonaws.com` (optional, for S3-compatible services)
+  
+  > **Note:** You must provide either GCP credentials (`GCP_SA_KEY`) OR AWS credentials (`AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`), but not both. The application will auto-detect the provider based on available credentials.
 - `ANTHROPIC_API_KEY=sk-ant-...` (optional)
 - `GOOGLE_VERTEX_AI_WEB_CREDENTIALS={"type":"service_account","project_id":"..."}` (JSON string, optional)
 - `OPENAI_BASE_URL=https://api.openai.com/v1` (defaults to `https://api.openai.com/v1` if not set)
@@ -143,7 +168,14 @@ kubectl create secret generic backend-secrets \
   --from-literal=OPENAI_API_KEY="sk-..." \
   --from-literal=VERBOSE_LOGGING="false" \
   --from-literal=BACKEND_REQUEST_TIMEOUT_MS="300000" \
+  # Storage credentials (choose GCS OR AWS, not both):
+  # For GCS:
   --from-literal=GCP_SA_KEY='{"type":"service_account","project_id":"..."}' \
+  # OR for AWS S3:
+  # --from-literal=AWS_ACCESS_KEY_ID="your_aws_access_key_id" \
+  # --from-literal=AWS_SECRET_ACCESS_KEY="your_aws_secret_access_key" \
+  # --from-literal=AWS_REGION="us-east-1" \
+  # --from-literal=AWS_ENDPOINT="https://s3.amazonaws.com" \
   --from-literal=ANTHROPIC_API_KEY="sk-ant-..." \
   --from-literal=GOOGLE_VERTEX_AI_WEB_CREDENTIALS='{"type":"service_account","project_id":"..."}' \
   --from-literal=OPENAI_BASE_URL="https://api.openai.com/v1" \
@@ -173,7 +205,16 @@ MCP Gateway secrets.
 
 **Optional Keys:**
 - `GOOGLE_PROJECTID=your_google_project_id` (optional)
-- `GCP_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string, optional)
+- **Storage Credentials (choose one):**
+  - **GCS (Google Cloud Storage):**
+    - `GCP_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string, optional)
+  - **AWS S3:**
+    - `AWS_ACCESS_KEY_ID=your_aws_access_key_id` (optional)
+    - `AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key` (optional)
+    - `AWS_REGION=us-east-1` (optional, defaults to us-east-1)
+    - `AWS_ENDPOINT=https://s3.amazonaws.com` (optional, for S3-compatible services)
+  
+  > **Note:** You must provide either GCP credentials (`GCP_SA_KEY`) OR AWS credentials (`AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`), but not both. The application will auto-detect the provider based on available credentials.
 - `ANTHROPIC_API_KEY=sk-ant-...` (optional)
 - `OPENAI_API_KEY=sk-...` (optional)
 - `GOOGLE_VERTEX_AI_WEB_CREDENTIALS={"type":"service_account","project_id":"..."}` (JSON string, optional)
@@ -196,7 +237,14 @@ kubectl create secret generic mcp-gateway-secrets \
   --from-literal=SPENDHQ_SS_PASSWORD="your_singlestore_password" \
   --from-literal=SPENDHQ_SS_PORT="3306" \
   --from-literal=GOOGLE_PROJECTID="your_google_project_id" \
+  # Storage credentials (choose GCS OR AWS, not both):
+  # For GCS:
   --from-literal=GCP_SA_KEY='{"type":"service_account","project_id":"..."}' \
+  # OR for AWS S3:
+  # --from-literal=AWS_ACCESS_KEY_ID="your_aws_access_key_id" \
+  # --from-literal=AWS_SECRET_ACCESS_KEY="your_aws_secret_access_key" \
+  # --from-literal=AWS_REGION="us-east-1" \
+  # --from-literal=AWS_ENDPOINT="https://s3.amazonaws.com" \
   --from-literal=ANTHROPIC_API_KEY="sk-ant-..." \
   --from-literal=OPENAI_API_KEY="sk-..." \
   --from-literal=GOOGLE_VERTEX_AI_WEB_CREDENTIALS='{"type":"service_account","project_id":"..."}' \
