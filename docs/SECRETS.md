@@ -1,6 +1,8 @@
-# Required Secrets
-
-This document lists all secrets required for Sligo Cloud deployment.
+---
+layout: page
+title: "Secrets Setup"
+description: "Required Kubernetes secrets and environment variables for Sligo Enterprise deployment."
+---
 
 ## Secret Creation Methods
 

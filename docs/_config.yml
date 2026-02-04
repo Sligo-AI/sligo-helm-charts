@@ -1,0 +1,119 @@
+# =============================================================================
+# Sligo Helm Charts Documentation (GitHub Pages from /docs)
+# =============================================================================
+
+# Site Settings
+title: "Sligo Enterprise - Helm Charts"
+description: "Official Helm charts for deploying Sligo Enterprise Platform."
+baseurl: "/sligo-helm-charts"
+url: "https://sligo-ai.github.io"
+
+# Theme (same as Terraform docs)
+remote_theme: Sligo-AI/sligo-jekyll-theme
+
+# Theme Settings
+theme_settings:
+  logo_light: "Full_Color_500x120.svg"
+  logo_dark: "Rev_Color_500x120.svg"
+  logo_mark_light: "Mark-Full_Color_150x150.svg"
+  logo_mark_dark: "Mark-Full_Color-Dark_Mode_150x150.svg"
+
+  dark_mode: true
+  search: true
+  version_selector: true
+  edit_on_github: true
+  copy_code_button: true
+  toc: true
+
+  github_repo: "Sligo-AI/sligo-helm-charts"
+  github_branch: "main"
+  docs_path: "docs/"
+
+  current_version: "1.0.0"
+  versions:
+    - label: "1.0.0"
+      url: "/"
+
+  header_links:
+    - label: "GitHub"
+      url: "https://github.com/Sligo-AI/sligo-helm-charts"
+      icon: "github"
+    - label: "Terraform"
+      url: "https://sligo-ai.github.io/sligo-terraform/"
+      icon: "cloud"
+    - label: "Support"
+      url: "mailto:support@sligo.ai"
+      icon: "mail"
+
+  footer:
+    copyright: "Sligo AI"
+    links:
+      - label: "Sligo AI"
+        url: "https://sligo.ai"
+      - label: "Terraform Modules"
+        url: "https://sligo-ai.github.io/sligo-terraform/"
+
+# Navigation (matches doc files in /docs)
+navigation:
+  - title: "Getting Started"
+    items:
+      - title: "Overview"
+        url: "/"
+        icon: "book"
+      - title: "Installation"
+        url: "/INSTALLATION/"
+        icon: "rocket"
+      - title: "Secrets Setup"
+        url: "/SECRETS/"
+        icon: "key"
+        badge: "Required"
+        badge_type: "warning"
+  - title: "Configuration"
+    items:
+      - title: "Configuration Reference"
+        url: "/CONFIGURATION/"
+        icon: "file-text"
+      - title: "Terraform Integration"
+        url: "/TERRAFORM/"
+        icon: "cloud"
+  - title: "Reference"
+    items:
+      - title: "Troubleshooting"
+        url: "/TROUBLESHOOTING/"
+        icon: "wrench"
+      - title: "Upgrade Guide"
+        url: "/UPGRADE/"
+        icon: "arrow-up"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+permalink: pretty
+
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+plugins:
+  - jekyll-remote-theme
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# When building from /docs, exclude parent repo files via GitHub Pages (source = docs)
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "page"
+  - scope:
+      path: "index.md"
+    values:
+      layout: "home"
+      permalink: /
