@@ -1,6 +1,8 @@
-# Terraform/IAC Integration
-
-This guide shows how to deploy Sligo Cloud using Infrastructure as Code (IAC) with Terraform.
+---
+layout: page
+title: "Terraform Integration"
+description: "Deploy Sligo Enterprise using Infrastructure as Code with Terraform."
+---
 
 ## Prerequisites
 
@@ -23,7 +25,7 @@ With Terraform, you can provision:
 1. **Kubernetes cluster** (EKS for AWS, GKE for GCP)
 2. **Database** (RDS for AWS, Cloud SQL for GCP, or in-cluster)
 3. **Cache** (ElastiCache for AWS, Memorystore for GCP, or in-cluster)
-4. **Helm Chart deployment** (Sligo Cloud application)
+4. **Helm Chart deployment** (Sligo Enterprise application)
 
 All in one Terraform configuration.
 
@@ -248,7 +250,7 @@ data "helm_repository" "sligo" {
   url  = "https://sligo-ai.github.io/sligo-helm-charts"
 }
 
-# Deploy Sligo Cloud Helm chart
+# Deploy Sligo Enterprise Helm chart
 resource "helm_release" "sligo_cloud" {
   name       = "sligo-app"
   repository = data.helm_repository.sligo.url
@@ -373,7 +375,7 @@ variable "sligo_service_account_key_path" {
 }
 
 variable "app_version" {
-  description = "Sligo Cloud application version"
+  description = "Sligo Enterprise application version"
   type        = string
   default     = "v1.0.0"
 }

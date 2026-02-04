@@ -1,6 +1,6 @@
 # Sligo Helm Charts
 
-Official Helm charts for deploying Sligo Cloud Platform.
+Official Helm charts for deploying Sligo Enterprise Platform.
 
 **Helm Repository:** [https://github.com/Sligo-AI/sligo-helm-charts](https://github.com/Sligo-AI/sligo-helm-charts)
 **Helm Page:** [https://sligo-ai.github.io/sligo-helm-charts/](https://sligo-ai.github.io/sligo-helm-charts/)
@@ -67,7 +67,7 @@ helm install sligo-app sligo/sligo-cloud \
 
 ## 📌 Versioning and Image Tags
 
-Sligo Cloud uses semantic versioning for container images. When deploying, you should pin to specific version tags for production deployments.
+Sligo Enterprise uses semantic versioning for container images. When deploying, you should pin to specific version tags for production deployments.
 
 ### Using Version Tags
 

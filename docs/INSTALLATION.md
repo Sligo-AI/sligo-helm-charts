@@ -1,4 +1,8 @@
-# Sligo Cloud - Installation Guide
+---
+layout: page
+title: "Installation Guide"
+description: "Step-by-step installation instructions for Sligo Enterprise Helm chart."
+---
 
 ## Prerequisites
 

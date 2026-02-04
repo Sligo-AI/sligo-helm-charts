@@ -1,6 +1,8 @@
-# Troubleshooting Guide
-
-Common issues and solutions for Sligo Cloud deployment.
+---
+layout: page
+title: "Troubleshooting"
+description: "Common issues and solutions for Sligo Enterprise deployment."
+---
 
 ## Table of Contents
 - [Installation Issues](#installation-issues)

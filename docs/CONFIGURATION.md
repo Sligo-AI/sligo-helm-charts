@@ -1,6 +1,8 @@
-# Configuration Reference
-
-Complete reference for all configuration values in Sligo Cloud Helm chart.
+---
+layout: page
+title: "Configuration Reference"
+description: "Complete reference for all configuration values in Sligo Enterprise Helm chart."
+---
 
 ## Table of Contents
 - [Global Settings](#global-settings)
@@ -70,7 +72,7 @@ us-central1-docker.pkg.dev/sligo-ai-platform/your-client-containers/mcp-gateway:
 
 ### Image Version Tags
 
-Sligo Cloud uses semantic versioning for container images. **For production deployments, always pin to specific version tags:**
+Sligo Enterprise uses semantic versioning for container images. **For production deployments, always pin to specific version tags:**
 
 ```yaml
 app:

@@ -1,6 +1,8 @@
-# Upgrade Guide
-
-How to upgrade Sligo Cloud to a new version.
+---
+layout: page
+title: "Upgrade Guide"
+description: "How to upgrade Sligo Enterprise to a new version."
+---
 
 ## Before Upgrading
 
