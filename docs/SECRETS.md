@@ -52,12 +52,12 @@ Application frontend secrets.
 - `MCP_GATEWAY_URL=http://mcp-gateway:3002` (or external URL)
 - `NEXT_PUBLIC_URL=https://app.your-domain.com`
 - `NODE_ENV=production` (or `development`)
-- `PINECONE_API_KEY=your_pinecone_api_key`
-- `PINECONE_INDEX=your_pinecone_index`
 - `PORT=3000`
-- `WORKOS_API_KEY=your_workos_api_key`
-- `WORKOS_CLIENT_ID=your_workos_client_id`
-- `WORKOS_COOKIE_PASSWORD=<generate with: openssl rand -base64 32>`
+- `OPENAI_API_KEY=sk-...` (required for RAG embeddings)
+- **Authentication (@Sligo-AI/auth)** – Set `AUTH_PROVIDER=workos` (default), `oidc`, or `saml`. Then provide the matching credentials:
+  - **When `AUTH_PROVIDER=workos`:** `WORKOS_API_KEY`, `WORKOS_CLIENT_ID`, `WORKOS_COOKIE_PASSWORD=<generate with: openssl rand -base64 32>`
+  - **When `AUTH_PROVIDER=oidc`:** `AUTH_SESSION_SECRET=<min 32 chars>`, `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`; optional: `OIDC_SCOPES`, `OIDC_DEFAULT_ORG_ID`, `OIDC_DEFAULT_ORG_NAME`
+  - **When `AUTH_PROVIDER=saml`:** `AUTH_SESSION_SECRET=<min 32 chars>`, `SAML_ENTRYPOINT`, `SAML_ISSUER`, `SAML_CERT` (IdP cert PEM); optional: `SAML_DEFAULT_ORG_ID`, `SAML_DEFAULT_ORG_NAME`
 - `NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id`
 - `NEXT_PUBLIC_GOOGLE_CLIENT_KEY=your_google_client_key`
 - `NEXT_PUBLIC_ONEDRIVE_CLIENT_ID=your_onedrive_client_id`
@@ -68,10 +68,20 @@ Application frontend secrets.
 - `BUCKET_NAME_FILE_MANAGER=your_storage_bucket`
 - `BUCKET_NAME_LOGOS=your_logos_bucket`
 - `BUCKET_NAME_RAG=your_rag_bucket`
-- `OPENAI_API_KEY=sk-...`
 
 **Optional Keys:**
 - `GOOGLE_PROJECTID=your_google_project_id` (optional, but recommended)
+- **Authentication (optional):**
+  - `AUTH_PROVIDER=workos` (default), `oidc`, or `saml`. Use `oidc` or `saml` for your own IdP / enterprise SSO.
+  - `AUTH_BASE_URL=https://app.your-domain.com` (fallback if `NEXT_PUBLIC_URL` not set)
+  - `AUTH_SESSION_SECRET=<min 32 chars>` (required when using OIDC or SAML; used for session signing)
+  - `AUTH_COOKIE_NAME=sligo_session` (optional; default session cookie name)
+- **Vector store credentials (optional; multiple allowed):**  
+  Each knowledge base folder is configured with a vector store (Pinecone, SingleStore, or future providers). Provide credentials only for the stores you use. You can set **both** Pinecone and SingleStore (and others) in the same secret; they do not overlap. The app uses the credentials that match the folder’s selected store.
+  - **Default when a folder has no selection:** `RAG_VECTOR_STORE=pinecone` (or `singlestore`). Omit to default to Pinecone.
+  - **Pinecone (optional):** `PINECONE_API_KEY`, `PINECONE_INDEX`. Optional: `PINECONE_ENVIRONMENT` (legacy SDK).
+  - **SingleStore (optional):** `SINGLESTORE_HOST`, `SINGLESTORE_PORT`, `SINGLESTORE_USER`, `SINGLESTORE_PASSWORD`, `SINGLESTORE_DATABASE`. Optional: `SINGLESTORE_*` table/field names (see app .env.example).
+  - Future vector stores will have their own optional env vars; add them alongside these when available.
 - **Storage Credentials (choose one):**
   - **GCS (Google Cloud Storage):**
     - `GCP_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string, optional)
@@ -93,12 +103,13 @@ kubectl create secret generic nextjs-secrets \
   --from-literal=MCP_GATEWAY_URL="http://mcp-gateway:3002" \
   --from-literal=NEXT_PUBLIC_URL="https://app.your-domain.com" \
   --from-literal=NODE_ENV="production" \
-  --from-literal=PINECONE_API_KEY="your_pinecone_api_key" \
-  --from-literal=PINECONE_INDEX="your_pinecone_index" \
   --from-literal=PORT="3000" \
+  --from-literal=AUTH_PROVIDER="workos" \
   --from-literal=WORKOS_API_KEY="your_workos_api_key" \
   --from-literal=WORKOS_CLIENT_ID="your_workos_client_id" \
   --from-literal=WORKOS_COOKIE_PASSWORD="$(openssl rand -base64 32)" \
+  # For OIDC instead of WorkOS: set AUTH_PROVIDER=oidc, AUTH_SESSION_SECRET, OIDC_ISSUER, OIDC_CLIENT_ID, OIDC_CLIENT_SECRET (and optional OIDC_SCOPES, OIDC_DEFAULT_ORG_*)
+  # For SAML: set AUTH_PROVIDER=saml, AUTH_SESSION_SECRET, SAML_ENTRYPOINT, SAML_ISSUER, SAML_CERT (and optional SAML_DEFAULT_ORG_*)
   --from-literal=NEXT_PUBLIC_GOOGLE_CLIENT_ID="your_google_client_id" \
   --from-literal=NEXT_PUBLIC_GOOGLE_CLIENT_KEY="your_google_client_key" \
   --from-literal=NEXT_PUBLIC_ONEDRIVE_CLIENT_ID="your_onedrive_client_id" \
@@ -111,6 +122,15 @@ kubectl create secret generic nextjs-secrets \
   --from-literal=BUCKET_NAME_RAG="your_rag_bucket" \
   --from-literal=OPENAI_API_KEY="sk-..." \
   --from-literal=GOOGLE_PROJECTID="your_google_project_id" \
+  # Vector store credentials (optional; include only the stores you use; multiple allowed):
+  # --from-literal=RAG_VECTOR_STORE="pinecone" \
+  # --from-literal=PINECONE_API_KEY="your_pinecone_api_key" \
+  # --from-literal=PINECONE_INDEX="your_pinecone_index" \
+  # --from-literal=SINGLESTORE_HOST="your_singlestore_host" \
+  # --from-literal=SINGLESTORE_PORT="3306" \
+  # --from-literal=SINGLESTORE_USER="your_singlestore_user" \
+  # --from-literal=SINGLESTORE_PASSWORD="your_singlestore_password" \
+  # --from-literal=SINGLESTORE_DATABASE="your_database" \
   # Storage credentials (choose GCS OR AWS, not both):
   # For GCS:
   --from-literal=GCP_SA_KEY='{"type":"service_account","project_id":"..."}' \
@@ -192,8 +212,7 @@ MCP Gateway secrets.
 **Required Keys:**
 - `PORT=3002`
 - `FRONTEND_URL=https://app.your-domain.com`
-- `PINECONE_API_KEY=your_pinecone_api_key`
-- `PINECONE_INDEX=your_pinecone_index`
+- `OPENAI_API_KEY=sk-...` (required for RAG embeddings; also used for LLMs if set)
 - `REDIS_URL=redis://redis:6379` (or external Redis URL)
 - `BUCKET_NAME_FILE_MANAGER=your_storage_bucket`
 - `SPENDHQ_BASE_URL=https://your-spendhq-url.com`
@@ -218,16 +237,20 @@ MCP Gateway secrets.
   
   > **Note:** You must provide either GCP credentials (`GCP_SA_KEY`) OR AWS credentials (`AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`), but not both. The application will auto-detect the provider based on available credentials.
 - `ANTHROPIC_API_KEY=sk-ant-...` (optional)
-- `OPENAI_API_KEY=sk-...` (optional)
 - `GOOGLE_VERTEX_AI_WEB_CREDENTIALS={"type":"service_account","project_id":"..."}` (JSON string, optional)
+- **Vector store credentials (optional; multiple allowed):**  
+  Managed knowledge base folders each use a chosen vector store (Pinecone, SingleStore, or future providers). Provide credentials only for the stores you use. You can set **both** Pinecone and SingleStore (and others) in the same secret; they do not overlap.
+  - **Default when a folder has no selection:** `RAG_VECTOR_STORE=pinecone` (or `singlestore`). Omit to default to Pinecone.
+  - **Pinecone (optional):** `PINECONE_API_KEY`, `PINECONE_INDEX`. Optional: `PINECONE_ENVIRONMENT`.
+  - **SingleStore (optional):** `SINGLESTORE_HOST`, `SINGLESTORE_PORT`, `SINGLESTORE_USER`, `SINGLESTORE_PASSWORD`, `SINGLESTORE_DATABASE`. Optional table/field env vars (see mcp-gateway .env.example).
+  - Future vector stores will have their own optional env vars; add them alongside these when available.
 
 **Creation:**
 ```bash
 kubectl create secret generic mcp-gateway-secrets \
   --from-literal=PORT="3002" \
   --from-literal=FRONTEND_URL="https://app.your-domain.com" \
-  --from-literal=PINECONE_API_KEY="your_pinecone_api_key" \
-  --from-literal=PINECONE_INDEX="your_pinecone_index" \
+  --from-literal=OPENAI_API_KEY="sk-..." \
   --from-literal=REDIS_URL="redis://redis:6379" \
   --from-literal=BUCKET_NAME_FILE_MANAGER="your_storage_bucket" \
   --from-literal=SPENDHQ_BASE_URL="https://your-spendhq-url.com" \
@@ -239,6 +262,15 @@ kubectl create secret generic mcp-gateway-secrets \
   --from-literal=SPENDHQ_SS_PASSWORD="your_singlestore_password" \
   --from-literal=SPENDHQ_SS_PORT="3306" \
   --from-literal=GOOGLE_PROJECTID="your_google_project_id" \
+  # Vector store credentials (optional; include only the stores you use; multiple allowed):
+  # --from-literal=RAG_VECTOR_STORE="pinecone" \
+  # --from-literal=PINECONE_API_KEY="your_pinecone_api_key" \
+  # --from-literal=PINECONE_INDEX="your_pinecone_index" \
+  # --from-literal=SINGLESTORE_HOST="your_singlestore_host" \
+  # --from-literal=SINGLESTORE_PORT="3306" \
+  # --from-literal=SINGLESTORE_USER="your_singlestore_user" \
+  # --from-literal=SINGLESTORE_PASSWORD="your_singlestore_password" \
+  # --from-literal=SINGLESTORE_DATABASE="your_database" \
   # Storage credentials (choose GCS OR AWS, not both):
   # For GCS:
   --from-literal=GCP_SA_KEY='{"type":"service_account","project_id":"..."}' \
@@ -248,7 +280,6 @@ kubectl create secret generic mcp-gateway-secrets \
   # --from-literal=AWS_REGION="us-east-1" \
   # --from-literal=AWS_ENDPOINT="https://s3.amazonaws.com" \
   --from-literal=ANTHROPIC_API_KEY="sk-ant-..." \
-  --from-literal=OPENAI_API_KEY="sk-..." \
   --from-literal=GOOGLE_VERTEX_AI_WEB_CREDENTIALS='{"type":"service_account","project_id":"..."}' \
   -n sligo
 ```
