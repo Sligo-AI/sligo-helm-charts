@@ -77,12 +77,14 @@ Application frontend secrets.
   - `AUTH_SESSION_SECRET=<min 32 chars>` (required when using OIDC or SAML; used for session signing)
   - `AUTH_COOKIE_NAME=sligo_session` (optional; default session cookie name)
 - **Vector store credentials (optional; multiple allowed):**  
-  Each knowledge base folder is configured with a vector store (Pinecone, SingleStore, or future providers). Provide credentials only for the stores you use. You can set **both** Pinecone and SingleStore (and others) in the same secret; they do not overlap. The app uses the credentials that match the folder’s selected store.
-  - **Default when a folder has no selection:** `RAG_VECTOR_STORE=pinecone` (or `singlestore`). Omit to default to Pinecone.
+  Each knowledge base folder is configured with a vector store (Pinecone, SingleStore, Azure AI Search, or future providers). Provide credentials only for the stores you use. You can set multiple stores in the same secret; they do not overlap. The app uses the credentials that match the folder’s selected store.
+  - **Default when a folder has no selection:** `RAG_VECTOR_STORE=pinecone` (or `singlestore` or `azureaisearch`). Omit to default to Pinecone.
   - **Pinecone (optional):** `PINECONE_API_KEY`, `PINECONE_INDEX`. Optional: `PINECONE_ENVIRONMENT` (legacy SDK).
   - **SingleStore (optional):** `SINGLESTORE_HOST`, `SINGLESTORE_PORT`, `SINGLESTORE_USER`, `SINGLESTORE_PASSWORD`, `SINGLESTORE_DATABASE`. Optional: `SINGLESTORE_*` table/field names (see app .env.example).
+  - **Azure AI Search (optional):** `AZURE_AISEARCH_ENDPOINT=https://your-service.search.windows.net`, `AZURE_AISEARCH_KEY=your_admin_key`, `AZURE_AISEARCH_INDEX=vectorsearch` (optional, default), `AZURE_AISEARCH_QUERY_TYPE=similarity_hybrid` (optional: `similarity`, `similarity_hybrid`, `semantic_hybrid`).
   - Future vector stores will have their own optional env vars; add them alongside these when available.
-- **Storage Credentials (choose one):**
+- **Storage:**
+  - `STORAGE_PROVIDER=gcs` or `STORAGE_PROVIDER=s3` (optional; default is `gcs` when unset). When set, this chooses the storage provider; otherwise the app infers from credentials.
   - **GCS (Google Cloud Storage):**
     - `GCP_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string, optional)
     - `RAG_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string, optional)
@@ -92,7 +94,7 @@ Application frontend secrets.
     - `AWS_REGION=us-east-1` (optional, defaults to us-east-1)
     - `AWS_ENDPOINT=https://s3.amazonaws.com` (optional, for S3-compatible services)
   
-  > **Note:** You must provide either GCP credentials (`GCP_SA_KEY`/`RAG_SA_KEY`) OR AWS credentials (`AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`), but not both. The application will auto-detect the provider based on available credentials.
+  > **Note:** Provide credentials for the provider you use. Set `STORAGE_PROVIDER` to `gcs` or `s3` to choose explicitly; when unset, the app defaults to `gcs` and can infer from which credentials are present.
 
 **Creation:**
 ```bash
@@ -131,11 +133,18 @@ kubectl create secret generic nextjs-secrets \
   # --from-literal=SINGLESTORE_USER="your_singlestore_user" \
   # --from-literal=SINGLESTORE_PASSWORD="your_singlestore_password" \
   # --from-literal=SINGLESTORE_DATABASE="your_database" \
-  # Storage credentials (choose GCS OR AWS, not both):
+  # Azure AI Search (optional): --from-literal=RAG_VECTOR_STORE="azureaisearch" \
+  # --from-literal=AZURE_AISEARCH_ENDPOINT="https://your-service.search.windows.net" \
+  # --from-literal=AZURE_AISEARCH_KEY="your_admin_key" \
+  # --from-literal=AZURE_AISEARCH_INDEX="vectorsearch" \
+  # --from-literal=AZURE_AISEARCH_QUERY_TYPE="similarity_hybrid" \
+  # Storage (optional): set provider explicitly; default is gcs
+  # --from-literal=STORAGE_PROVIDER="gcs" \
   # For GCS:
   --from-literal=GCP_SA_KEY='{"type":"service_account","project_id":"..."}' \
   --from-literal=RAG_SA_KEY='{"type":"service_account","project_id":"..."}' \
   # OR for AWS S3:
+  # --from-literal=STORAGE_PROVIDER="s3" \
   # --from-literal=AWS_ACCESS_KEY_ID="your_aws_access_key_id" \
   # --from-literal=AWS_SECRET_ACCESS_KEY="your_aws_secret_access_key" \
   # --from-literal=AWS_REGION="us-east-1" \
@@ -161,20 +170,18 @@ Backend API secrets.
 **Optional Keys:**
 - `VERBOSE_LOGGING=true` (or `false`, defaults to `true`)
 - `BACKEND_REQUEST_TIMEOUT_MS=300000` (defaults to 300000 if not set)
-- **Storage Credentials (choose one):**
-  - **GCS (Google Cloud Storage):**
-    - `GCP_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string, optional)
-  - **AWS S3:**
-    - `AWS_ACCESS_KEY_ID=your_aws_access_key_id` (optional)
-    - `AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key` (optional)
-    - `AWS_REGION=us-east-1` (optional, defaults to us-east-1)
-    - `AWS_ENDPOINT=https://s3.amazonaws.com` (optional, for S3-compatible services)
+- **Storage:**
+  - `STORAGE_PROVIDER=gcs` or `STORAGE_PROVIDER=s3` (optional; default is `gcs` when unset).
+  - **GCS:** `GCP_SA_KEY={"type":"service_account","project_id":"..."}` (optional)
+  - **AWS S3:** `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION=us-east-1` (optional), `AWS_ENDPOINT` (optional)
   
-  > **Note:** You must provide either GCP credentials (`GCP_SA_KEY`) OR AWS credentials (`AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`), but not both. The application will auto-detect the provider based on available credentials.
+  > **Note:** Set `STORAGE_PROVIDER` to choose the provider; when unset, the app defaults to `gcs` and infers from credentials.
 - `ANTHROPIC_API_KEY=sk-ant-...` (optional)
 - `GOOGLE_VERTEX_AI_WEB_CREDENTIALS={"type":"service_account","project_id":"..."}` (JSON string, optional)
 - `OPENAI_BASE_URL=https://api.openai.com/v1` (defaults to `https://api.openai.com/v1` if not set)
+- **Azure OpenAI (optional):** `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_API_INSTANCE_NAME`, `AZURE_OPENAI_API_VERSION`, `AZURE_OPENAI_BASE_PATH` (e.g. `https://your-resource.openai.azure.com/openai/deployments/your-deployment`)
 - `LANGSMITH_API_KEY=your_langsmith_api_key` (optional)
+- `LANGCHAIN_CALLBACKS_BACKGROUND=false` (optional, default `false`)
 
 **Creation:**
 ```bash
@@ -190,18 +197,20 @@ kubectl create secret generic backend-secrets \
   --from-literal=OPENAI_API_KEY="sk-..." \
   --from-literal=VERBOSE_LOGGING="false" \
   --from-literal=BACKEND_REQUEST_TIMEOUT_MS="300000" \
-  # Storage credentials (choose GCS OR AWS, not both):
-  # For GCS:
+  # Storage (optional): STORAGE_PROVIDER=gcs or s3; then GCS or AWS credentials
+  # --from-literal=STORAGE_PROVIDER="gcs" \
   --from-literal=GCP_SA_KEY='{"type":"service_account","project_id":"..."}' \
-  # OR for AWS S3:
-  # --from-literal=AWS_ACCESS_KEY_ID="your_aws_access_key_id" \
-  # --from-literal=AWS_SECRET_ACCESS_KEY="your_aws_secret_access_key" \
-  # --from-literal=AWS_REGION="us-east-1" \
-  # --from-literal=AWS_ENDPOINT="https://s3.amazonaws.com" \
+  # OR for AWS S3: --from-literal=STORAGE_PROVIDER="s3" \ and AWS_* keys
   --from-literal=ANTHROPIC_API_KEY="sk-ant-..." \
   --from-literal=GOOGLE_VERTEX_AI_WEB_CREDENTIALS='{"type":"service_account","project_id":"..."}' \
   --from-literal=OPENAI_BASE_URL="https://api.openai.com/v1" \
   --from-literal=LANGSMITH_API_KEY="your_langsmith_api_key" \
+  # Azure OpenAI (optional):
+  # --from-literal=AZURE_OPENAI_API_KEY="your_azure_openai_key" \
+  # --from-literal=AZURE_OPENAI_API_INSTANCE_NAME="your_instance_name" \
+  # --from-literal=AZURE_OPENAI_API_VERSION="2024-02-15-preview" \
+  # --from-literal=AZURE_OPENAI_BASE_PATH="https://your-resource.openai.azure.com/openai/deployments/your-deployment" \
+  # --from-literal=LANGCHAIN_CALLBACKS_BACKGROUND="false" \
   -n sligo
 ```
 
@@ -215,34 +224,27 @@ MCP Gateway secrets.
 - `OPENAI_API_KEY=sk-...` (required for RAG embeddings; also used for LLMs if set)
 - `REDIS_URL=redis://redis:6379` (or external Redis URL)
 - `BUCKET_NAME_FILE_MANAGER=your_storage_bucket`
-- `SPENDHQ_BASE_URL=https://your-spendhq-url.com`
-- `SPENDHQ_CLIENT_ID=your_spendhq_client_id`
-- `SPENDHQ_CLIENT_SECRET=your_spendhq_client_secret`
-- `SPENDHQ_TOKEN_URL=https://your-spendhq-token-url.com`
-- `SPENDHQ_SS_HOST=your_singlestore_host`
-- `SPENDHQ_SS_USERNAME=your_singlestore_username`
-- `SPENDHQ_SS_PASSWORD=your_singlestore_password`
-- `SPENDHQ_SS_PORT=3306`
 
 **Optional Keys:**
 - `GOOGLE_PROJECTID=your_google_project_id` (optional)
-- **Storage Credentials (choose one):**
-  - **GCS (Google Cloud Storage):**
-    - `GCP_SA_KEY={"type":"service_account","project_id":"..."}` (JSON string, optional)
-  - **AWS S3:**
-    - `AWS_ACCESS_KEY_ID=your_aws_access_key_id` (optional)
-    - `AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key` (optional)
-    - `AWS_REGION=us-east-1` (optional, defaults to us-east-1)
-    - `AWS_ENDPOINT=https://s3.amazonaws.com` (optional, for S3-compatible services)
+- **SpendHQ server (optional; required when using SpendHQ tools):** `SPENDHQ_BASE_URL`, `SPENDHQ_CLIENT_ID`, `SPENDHQ_CLIENT_SECRET`, `SPENDHQ_TOKEN_URL`, `SPENDHQ_SS_HOST`, `SPENDHQ_SS_USERNAME`, `SPENDHQ_SS_PASSWORD`, `SPENDHQ_SS_PORT=3306`
+- **Perplexity server (optional; required when using Perplexity tools):** `PERPLEXITY_API_KEY`
+- **Tavily server (optional; required when using Tavily tools):** `TAVILY_API_KEY`
+- **Sirion server (optional):** `SIRION_BASE_URL`, `SIRION_CLIENT_ID`, `SIRION_CLIENT_SECRET`
+- **Storage:**
+  - `STORAGE_PROVIDER=gcs` or `STORAGE_PROVIDER=s3` (optional; default is `gcs` when unset).
+  - **GCS:** `GCP_SA_KEY={"type":"service_account","project_id":"..."}` (optional)
+  - **AWS S3:** `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_ENDPOINT` (optional)
   
-  > **Note:** You must provide either GCP credentials (`GCP_SA_KEY`) OR AWS credentials (`AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`), but not both. The application will auto-detect the provider based on available credentials.
+  > **Note:** Set `STORAGE_PROVIDER` to choose the provider; when unset, the app defaults to `gcs` and infers from credentials.
 - `ANTHROPIC_API_KEY=sk-ant-...` (optional)
 - `GOOGLE_VERTEX_AI_WEB_CREDENTIALS={"type":"service_account","project_id":"..."}` (JSON string, optional)
 - **Vector store credentials (optional; multiple allowed):**  
-  Managed knowledge base folders each use a chosen vector store (Pinecone, SingleStore, or future providers). Provide credentials only for the stores you use. You can set **both** Pinecone and SingleStore (and others) in the same secret; they do not overlap.
-  - **Default when a folder has no selection:** `RAG_VECTOR_STORE=pinecone` (or `singlestore`). Omit to default to Pinecone.
+  Managed knowledge base folders each use a chosen vector store (Pinecone, SingleStore, Azure AI Search, or future providers). Provide credentials only for the stores you use. You can set multiple stores in the same secret; they do not overlap.
+  - **Default when a folder has no selection:** `RAG_VECTOR_STORE=pinecone` (or `singlestore` or `azureaisearch`). Omit to default to Pinecone.
   - **Pinecone (optional):** `PINECONE_API_KEY`, `PINECONE_INDEX`. Optional: `PINECONE_ENVIRONMENT`.
   - **SingleStore (optional):** `SINGLESTORE_HOST`, `SINGLESTORE_PORT`, `SINGLESTORE_USER`, `SINGLESTORE_PASSWORD`, `SINGLESTORE_DATABASE`. Optional table/field env vars (see mcp-gateway .env.example).
+  - **Azure AI Search (optional):** `AZURE_AISEARCH_ENDPOINT`, `AZURE_AISEARCH_KEY`, `AZURE_AISEARCH_INDEX`, `AZURE_AISEARCH_QUERY_TYPE` (see nextjs-secrets for details).
   - Future vector stores will have their own optional env vars; add them alongside these when available.
 
 **Creation:**
@@ -253,15 +255,19 @@ kubectl create secret generic mcp-gateway-secrets \
   --from-literal=OPENAI_API_KEY="sk-..." \
   --from-literal=REDIS_URL="redis://redis:6379" \
   --from-literal=BUCKET_NAME_FILE_MANAGER="your_storage_bucket" \
-  --from-literal=SPENDHQ_BASE_URL="https://your-spendhq-url.com" \
-  --from-literal=SPENDHQ_CLIENT_ID="your_spendhq_client_id" \
-  --from-literal=SPENDHQ_CLIENT_SECRET="your_spendhq_client_secret" \
-  --from-literal=SPENDHQ_TOKEN_URL="https://your-spendhq-token-url.com" \
-  --from-literal=SPENDHQ_SS_HOST="your_singlestore_host" \
-  --from-literal=SPENDHQ_SS_USERNAME="your_singlestore_username" \
-  --from-literal=SPENDHQ_SS_PASSWORD="your_singlestore_password" \
-  --from-literal=SPENDHQ_SS_PORT="3306" \
   --from-literal=GOOGLE_PROJECTID="your_google_project_id" \
+  # SpendHQ (optional; include when using SpendHQ server):
+  # --from-literal=SPENDHQ_BASE_URL="https://your-spendhq-url.com" \
+  # --from-literal=SPENDHQ_CLIENT_ID="your_spendhq_client_id" \
+  # --from-literal=SPENDHQ_CLIENT_SECRET="your_spendhq_client_secret" \
+  # --from-literal=SPENDHQ_TOKEN_URL="https://your-spendhq-token-url.com" \
+  # --from-literal=SPENDHQ_SS_HOST="your_singlestore_host" \
+  # --from-literal=SPENDHQ_SS_USERNAME="your_singlestore_username" \
+  # --from-literal=SPENDHQ_SS_PASSWORD="your_singlestore_password" \
+  # --from-literal=SPENDHQ_SS_PORT="3306" \
+  # Perplexity (optional): --from-literal=PERPLEXITY_API_KEY="your_perplexity_api_key" \
+  # Tavily (optional): --from-literal=TAVILY_API_KEY="your_tavily_api_key" \
+  # Sirion (optional): --from-literal=SIRION_BASE_URL="..." \ --from-literal=SIRION_CLIENT_ID="..." \ --from-literal=SIRION_CLIENT_SECRET="..." \
   # Vector store credentials (optional; include only the stores you use; multiple allowed):
   # --from-literal=RAG_VECTOR_STORE="pinecone" \
   # --from-literal=PINECONE_API_KEY="your_pinecone_api_key" \
@@ -271,14 +277,15 @@ kubectl create secret generic mcp-gateway-secrets \
   # --from-literal=SINGLESTORE_USER="your_singlestore_user" \
   # --from-literal=SINGLESTORE_PASSWORD="your_singlestore_password" \
   # --from-literal=SINGLESTORE_DATABASE="your_database" \
-  # Storage credentials (choose GCS OR AWS, not both):
-  # For GCS:
+  # Azure AI Search: --from-literal=RAG_VECTOR_STORE="azureaisearch" \
+  # --from-literal=AZURE_AISEARCH_ENDPOINT="https://your-service.search.windows.net" \
+  # --from-literal=AZURE_AISEARCH_KEY="your_admin_key" \
+  # --from-literal=AZURE_AISEARCH_INDEX="vectorsearch" \
+  # --from-literal=AZURE_AISEARCH_QUERY_TYPE="similarity_hybrid" \
+  # Storage (optional): STORAGE_PROVIDER=gcs or s3; then GCS or AWS credentials
+  # --from-literal=STORAGE_PROVIDER="gcs" \
   --from-literal=GCP_SA_KEY='{"type":"service_account","project_id":"..."}' \
-  # OR for AWS S3:
-  # --from-literal=AWS_ACCESS_KEY_ID="your_aws_access_key_id" \
-  # --from-literal=AWS_SECRET_ACCESS_KEY="your_aws_secret_access_key" \
-  # --from-literal=AWS_REGION="us-east-1" \
-  # --from-literal=AWS_ENDPOINT="https://s3.amazonaws.com" \
+  # OR for AWS S3: --from-literal=STORAGE_PROVIDER="s3" \ and AWS_* keys
   --from-literal=ANTHROPIC_API_KEY="sk-ant-..." \
   --from-literal=GOOGLE_VERTEX_AI_WEB_CREDENTIALS='{"type":"service_account","project_id":"..."}' \
   -n sligo
