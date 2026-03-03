@@ -22,6 +22,8 @@ Before installing the Helm chart, you must create Kubernetes secrets containing 
 - **`postgres-secrets`** or **`postgres-external-secrets`** - Database credentials (depending on database type)
 - **`redis-external-secrets`** - Redis credentials (if using external Redis)
 
+Internal Redis (Redis Stack) is supported in GKE with optional persistent storage.
+
 **📖 See [Secrets Setup Guide](docs/SECRETS.md) for complete list of required keys and creation commands.**
 
 Example:
