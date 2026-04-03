@@ -5,3 +5,6 @@ docs/.jekyll-cache/
 
 # Bundler
 Gemfile.lock
+
+# helm repo index charts/ writes here if run from repo root; canonical index is docs/index.yaml + root index.yaml
+charts/index.yaml

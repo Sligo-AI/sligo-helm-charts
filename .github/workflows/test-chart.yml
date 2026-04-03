@@ -7,6 +7,8 @@ on:
       - dev
     paths:
       - 'charts/**'
+      - 'docs/charts/**'
+      - 'docs/index.yaml'
       - 'index.yaml'
   pull_request:
     branches:
@@ -14,6 +16,8 @@ on:
       - dev
     paths:
       - 'charts/**'
+      - 'docs/charts/**'
+      - 'docs/index.yaml'
       - 'index.yaml'
   workflow_dispatch:
 
@@ -113,7 +117,7 @@ jobs:
       
       - name: Template test
         run: |
-          helm template test ./charts/sligo-cloud-1.0.0.tgz \
+          helm template test ./charts/sligo-cloud-1.0.1.tgz \
             --debug
       
       # - name: Install chart with internal database
