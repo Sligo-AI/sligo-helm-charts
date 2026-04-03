@@ -6,6 +6,8 @@ Official Helm charts for deploying Sligo Enterprise Platform.
 **Helm Page:** [https://sligo-ai.github.io/sligo-helm-charts/](https://sligo-ai.github.io/sligo-helm-charts/)
 **Terraform Repository:** [https://github.com/Sligo-AI/sligo-terraform](https://github.com/Sligo-AI/sligo-terraform)
 
+**Maintainers:** GitHub Pages serves from `/docs`. After changing tarballs under `charts/`, run `./scripts/sync-github-pages-helm-index.sh`, then commit `docs/charts/`, `docs/index.yaml`, and root `index.yaml`.
+
 
 
 ## Installation
@@ -50,7 +52,7 @@ helm repo update
 
 ```bash
 helm install sligo-app sligo/sligo-cloud \
-  --version 1.0.0 \
+  --version 1.0.1 \
   -f values-production.yaml \
   -n sligo \
   --create-namespace
@@ -66,6 +68,8 @@ helm install sligo-app sligo/sligo-cloud \
 - [Terraform/IAC Integration](docs/TERRAFORM.md) - Infrastructure as Code setup
 - [Troubleshooting](docs/TROUBLESHOOTING.md) - Common issues and solutions
 - [Upgrade Guide](docs/UPGRADE.md) - How to upgrade to new versions
+
+Cloud-specific `values-gcp.yaml` and `values-aws.yaml` files are intentionally not part of this chart repo. Cloud and client configuration should be set via Terraform module `yamlencode()` values and environment-specific IaC config.
 
 ## 📌 Versioning and Image Tags
 
