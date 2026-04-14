@@ -3,9 +3,9 @@ entries:
   sligo-cloud:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-04-14T17:13:26.873439815Z"
+    created: "2026-04-14T17:49:56.830197246Z"
     description: Sligo Enterprise Platform - Complete application stack
-    digest: 1457411a14dfcc530b4e15ea71d760e4013bb399871d151063a0c4a92cf174b5
+    digest: e7076c55224d6644cc05112aee1dc0900e75365acc90347d26ce9cc0d20599f0
     home: https://github.com/Sligo-AI/sligo-helm-charts
     keywords:
     - sligo
@@ -21,7 +21,7 @@ entries:
     version: 1.0.2
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-04-14T17:13:26.872625126Z"
+    created: "2026-04-14T17:49:56.82912538Z"
     description: Sligo Enterprise Platform - Complete application stack
     digest: f04544ed22b85f671375c1ae1a2eab07d66eb172b5688d4076c25acd6ce89868
     home: https://github.com/Sligo-AI/sligo-helm-charts
@@ -39,7 +39,7 @@ entries:
     version: 1.0.1
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-04-14T17:13:26.871810917Z"
+    created: "2026-04-14T17:49:56.828048014Z"
     description: Sligo Cloud Platform - Complete application stack
     digest: 0917c98108595ab08cc526d1afb3a16c6df137b2552ba3b51fc28e475ea09bdc
     home: https://github.com/Sligo-AI/sligo-helm-charts
@@ -55,4 +55,4 @@ entries:
     urls:
     - https://sligo-ai.github.io/sligo-helm-charts/charts/sligo-cloud-1.0.0.tgz
     version: 1.0.0
-generated: "2026-04-14T17:13:26.870863046Z"
+generated: "2026-04-14T17:49:56.826861575Z"
