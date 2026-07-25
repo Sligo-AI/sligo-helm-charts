@@ -3,7 +3,31 @@ entries:
   sligo-cloud:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-06-19T15:47:49.223934748Z"
+    created: "2026-07-25T00:00:54.244952738Z"
+    dependencies:
+    - alias: temporal-server
+      condition: temporal.selfHosted
+      name: temporal
+      repository: https://go.temporal.io/helm-charts
+      version: 1.2.0
+    description: Sligo Enterprise Platform - Complete application stack
+    digest: c4580a96b94e8ab4b0b0a1526a3f9323fde678aa3ebd2faa5ade659f9b488a64
+    home: https://github.com/Sligo-AI/sligo-helm-charts
+    keywords:
+    - sligo
+    - cloud
+    - platform
+    maintainers:
+    - email: support@sligo.ai
+      name: Sligo Team
+    name: sligo-cloud
+    type: application
+    urls:
+    - https://sligo-ai.github.io/sligo-helm-charts/charts/sligo-cloud-1.1.1.tgz
+    version: 1.1.1
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-07-25T00:00:54.240986332Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -27,7 +51,7 @@ entries:
     version: 1.1.0
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-06-19T15:47:49.221398591Z"
+    created: "2026-07-25T00:00:54.237765896Z"
     description: Sligo Enterprise Platform - Complete application stack
     digest: 1c6879019bb2537f345528d294fa39117657fc2ed115ed230b50ea99bfaa6c77
     home: https://github.com/Sligo-AI/sligo-helm-charts
@@ -45,7 +69,7 @@ entries:
     version: 1.0.2
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-06-19T15:47:49.219850261Z"
+    created: "2026-07-25T00:00:54.235027528Z"
     description: Sligo Enterprise Platform - Complete application stack
     digest: f04544ed22b85f671375c1ae1a2eab07d66eb172b5688d4076c25acd6ce89868
     home: https://github.com/Sligo-AI/sligo-helm-charts
@@ -63,7 +87,7 @@ entries:
     version: 1.0.1
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-06-19T15:47:49.218356568Z"
+    created: "2026-07-25T00:00:54.233953435Z"
     description: Sligo Cloud Platform - Complete application stack
     digest: 0917c98108595ab08cc526d1afb3a16c6df137b2552ba3b51fc28e475ea09bdc
     home: https://github.com/Sligo-AI/sligo-helm-charts
@@ -79,4 +103,4 @@ entries:
     urls:
     - https://sligo-ai.github.io/sligo-helm-charts/charts/sligo-cloud-1.0.0.tgz
     version: 1.0.0
-generated: "2026-06-19T15:47:49.217280319Z"
+generated: "2026-07-25T00:00:54.232621962Z"
