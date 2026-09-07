@@ -3,7 +3,36 @@ entries:
   sligo-cloud:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-09-05T18:59:24.618157363Z"
+    created: "2026-09-07T20:26:28.362675359Z"
+    dependencies:
+    - alias: temporal-server
+      condition: temporal.selfHosted
+      name: temporal
+      repository: https://go.temporal.io/helm-charts
+      version: 1.2.0
+    - alias: langfuse-server
+      condition: langfuse.selfHosted
+      name: langfuse
+      repository: https://langfuse.github.io/langfuse-k8s
+      version: 2.1.0
+    description: Sligo Enterprise Platform - Complete application stack
+    digest: f7fd5f5f4bae4aff0cc96a2e28867883945752c31b658e2977fdc75ef2a27ede
+    home: https://github.com/Sligo-AI/sligo-helm-charts
+    keywords:
+    - sligo
+    - cloud
+    - platform
+    maintainers:
+    - email: support@sligo.ai
+      name: Sligo Team
+    name: sligo-cloud
+    type: application
+    urls:
+    - https://sligo-ai.github.io/sligo-helm-charts/charts/sligo-cloud-1.3.1.tgz
+    version: 1.3.1
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-09-07T20:26:28.351220486Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -32,7 +61,7 @@ entries:
     version: 1.3.0
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-09-05T18:59:24.605355422Z"
+    created: "2026-09-07T20:26:28.339857881Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -56,7 +85,7 @@ entries:
     version: 1.2.4
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-09-05T18:59:24.602610925Z"
+    created: "2026-09-07T20:26:28.335578866Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -80,7 +109,7 @@ entries:
     version: 1.2.3
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-09-05T18:59:24.600056534Z"
+    created: "2026-09-07T20:26:28.332883739Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -104,7 +133,7 @@ entries:
     version: 1.2.2
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-09-05T18:59:24.595763065Z"
+    created: "2026-09-07T20:26:28.329262452Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -128,7 +157,7 @@ entries:
     version: 1.2.1
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-09-05T18:59:24.593272088Z"
+    created: "2026-09-07T20:26:28.32556925Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -152,7 +181,7 @@ entries:
     version: 1.2.0
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-09-05T18:59:24.589371449Z"
+    created: "2026-09-07T20:26:28.322882944Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -176,7 +205,7 @@ entries:
     version: 1.1.2
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-09-05T18:59:24.586994059Z"
+    created: "2026-09-07T20:26:28.318836052Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -200,7 +229,7 @@ entries:
     version: 1.1.1
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-09-05T18:59:24.583192861Z"
+    created: "2026-09-07T20:26:28.316134853Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -224,7 +253,7 @@ entries:
     version: 1.1.0
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-09-05T18:59:24.580745768Z"
+    created: "2026-09-07T20:26:28.313414059Z"
     description: Sligo Enterprise Platform - Complete application stack
     digest: 1c6879019bb2537f345528d294fa39117657fc2ed115ed230b50ea99bfaa6c77
     home: https://github.com/Sligo-AI/sligo-helm-charts
@@ -242,7 +271,7 @@ entries:
     version: 1.0.2
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-09-05T18:59:24.579917385Z"
+    created: "2026-09-07T20:26:28.311100653Z"
     description: Sligo Enterprise Platform - Complete application stack
     digest: f04544ed22b85f671375c1ae1a2eab07d66eb172b5688d4076c25acd6ce89868
     home: https://github.com/Sligo-AI/sligo-helm-charts
@@ -260,7 +289,7 @@ entries:
     version: 1.0.1
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-09-05T18:59:24.579067761Z"
+    created: "2026-09-07T20:26:28.310208467Z"
     description: Sligo Cloud Platform - Complete application stack
     digest: 0917c98108595ab08cc526d1afb3a16c6df137b2552ba3b51fc28e475ea09bdc
     home: https://github.com/Sligo-AI/sligo-helm-charts
@@ -276,4 +305,4 @@ entries:
     urls:
     - https://sligo-ai.github.io/sligo-helm-charts/charts/sligo-cloud-1.0.0.tgz
     version: 1.0.0
-generated: "2026-09-05T18:59:24.57816653Z"
+generated: "2026-09-07T20:26:28.308932606Z"
