@@ -3,7 +3,36 @@ entries:
   sligo-cloud:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-10-20T01:57:45.060396535Z"
+    created: "2026-11-07T23:02:14.273063671Z"
+    dependencies:
+    - alias: temporal-server
+      condition: temporal.selfHosted
+      name: temporal
+      repository: https://go.temporal.io/helm-charts
+      version: 1.2.0
+    - alias: langfuse-server
+      condition: langfuse.selfHosted
+      name: langfuse
+      repository: https://langfuse.github.io/langfuse-k8s
+      version: 2.1.6
+    description: Sligo Enterprise Platform - Complete application stack
+    digest: a96f6b9d56abe25c15bd36da3b7f73740c486217e01f806e162f83fe298a8f99
+    home: https://github.com/Sligo-AI/sligo-helm-charts
+    keywords:
+    - sligo
+    - cloud
+    - platform
+    maintainers:
+    - email: support@sligo.ai
+      name: Sligo Team
+    name: sligo-cloud
+    type: application
+    urls:
+    - https://sligo-ai.github.io/sligo-helm-charts/charts/sligo-cloud-1.3.8.tgz
+    version: 1.3.8
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-11-07T23:02:14.259895734Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -32,7 +61,7 @@ entries:
     version: 1.3.7
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-10-20T01:57:45.048024145Z"
+    created: "2026-11-07T23:02:14.242243319Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -61,7 +90,7 @@ entries:
     version: 1.3.5
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-10-20T01:57:45.033971721Z"
+    created: "2026-11-07T23:02:14.221561284Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -90,7 +119,7 @@ entries:
     version: 1.3.4
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-10-20T01:57:45.020720086Z"
+    created: "2026-11-07T23:02:14.208588808Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -119,7 +148,7 @@ entries:
     version: 1.3.2
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-10-20T01:57:45.011480008Z"
+    created: "2026-11-07T23:02:14.19378168Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -148,7 +177,7 @@ entries:
     version: 1.3.1
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-10-20T01:57:44.995660722Z"
+    created: "2026-11-07T23:02:14.180494569Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -177,7 +206,7 @@ entries:
     version: 1.3.0
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-10-20T01:57:44.98641274Z"
+    created: "2026-11-07T23:02:14.167321973Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -201,7 +230,7 @@ entries:
     version: 1.2.4
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-10-20T01:57:44.98417053Z"
+    created: "2026-11-07T23:02:14.162164623Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -225,7 +254,7 @@ entries:
     version: 1.2.3
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-10-20T01:57:44.97995046Z"
+    created: "2026-11-07T23:02:14.159037268Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -249,7 +278,7 @@ entries:
     version: 1.2.2
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-10-20T01:57:44.97774807Z"
+    created: "2026-11-07T23:02:14.154052571Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -273,7 +302,7 @@ entries:
     version: 1.2.1
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-10-20T01:57:44.975145417Z"
+    created: "2026-11-07T23:02:14.150882373Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -297,7 +326,7 @@ entries:
     version: 1.2.0
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-10-20T01:57:44.97045795Z"
+    created: "2026-11-07T23:02:14.146671526Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -321,7 +350,7 @@ entries:
     version: 1.1.2
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-10-20T01:57:44.968190232Z"
+    created: "2026-11-07T23:02:14.143065401Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -345,7 +374,7 @@ entries:
     version: 1.1.1
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-10-20T01:57:44.964710076Z"
+    created: "2026-11-07T23:02:14.139968962Z"
     dependencies:
     - alias: temporal-server
       condition: temporal.selfHosted
@@ -369,7 +398,7 @@ entries:
     version: 1.1.0
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-10-20T01:57:44.962672875Z"
+    created: "2026-11-07T23:02:14.134876404Z"
     description: Sligo Enterprise Platform - Complete application stack
     digest: 1c6879019bb2537f345528d294fa39117657fc2ed115ed230b50ea99bfaa6c77
     home: https://github.com/Sligo-AI/sligo-helm-charts
@@ -387,7 +416,7 @@ entries:
     version: 1.0.2
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-10-20T01:57:44.961972829Z"
+    created: "2026-11-07T23:02:14.133808976Z"
     description: Sligo Enterprise Platform - Complete application stack
     digest: f04544ed22b85f671375c1ae1a2eab07d66eb172b5688d4076c25acd6ce89868
     home: https://github.com/Sligo-AI/sligo-helm-charts
@@ -405,7 +434,7 @@ entries:
     version: 1.0.1
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-10-20T01:57:44.961190009Z"
+    created: "2026-11-07T23:02:14.132684335Z"
     description: Sligo Cloud Platform - Complete application stack
     digest: 0917c98108595ab08cc526d1afb3a16c6df137b2552ba3b51fc28e475ea09bdc
     home: https://github.com/Sligo-AI/sligo-helm-charts
@@ -421,4 +450,4 @@ entries:
     urls:
     - https://sligo-ai.github.io/sligo-helm-charts/charts/sligo-cloud-1.0.0.tgz
     version: 1.0.0
-generated: "2026-10-20T01:57:44.959876379Z"
+generated: "2026-11-07T23:02:14.131517061Z"
